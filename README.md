@@ -10,7 +10,9 @@ Simulateur réseau pédagogique hors-ligne, type Filius/Packet Tracer, avec anal
 - **Trames réelles** (octets) et **analyseur type Wireshark** : filtres d'affichage, détail champ par champ + hexdump, suivi de flux TCP, statistiques, export `.pcap`.
 - **Réseau** : adressage IPv4/IPv6, ARP/NDP, DHCP/DHCPv6-SLAAC, DNS, HTTP/HTTPS, NAT/PAT, ACL, VLAN/trunk 802.1Q, routage inter-VLAN, STP/Rapid-PVST, EtherChannel (LACP/PAgP), routage statique/RIP/OSPF, VPN (GRE, IPsec ISAKMP/IKEv1 + ESP), SNMP (v1/v2c) + syslog, RADIUS/802.1X (EAP-MD5, PEAP, VLAN dynamique, MAB), VoIP (SIP/RTP) et QoS (LLQ).
 - **Cybersécurité** : scan de ports, usurpation ARP (MITM), saturation de table MAC, serveur DHCP indésirable, port-security — avec TP dédiés en section « Cybersécurité ».
-- **TP d'exemple** (sections Réseau et Cybersécurité) avec correction et vérification automatique du travail ; matrice de couverture du programme (menu Aide).
+- **CCNA** : plan d'adressage VLSM, bonnes pratiques STP (PortFast/BPDU Guard) — section « CCNA ».
+- **Habilitation Stormshield** : politique de filtrage (moindre privilège), diagnostic par le journal — section « Stormshield ».
+- **TP d'exemple** (menu à listes déroulantes : section puis sujet) avec correction et vérification automatique du travail ; matrice de couverture du programme (menu Aide).
 - Sauvegarde/chargement JSON, sauvegarde automatique dans le navigateur (localStorage).
 
 ## Fiches produits

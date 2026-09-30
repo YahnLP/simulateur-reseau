@@ -84,11 +84,24 @@ function runChecks(sc, res) {
   res.insertBefore(h('p', { style: { fontWeight: 600, color: okN === sc.checks.length ? '#166534' : '#92400e' } }, okN + ' / ' + sc.checks.length + ' vérifications réussies'), res.firstChild);
   app.refresh();
 }
-$('#btn-scen').addEventListener('click', e => {
-  const r = e.target.getBoundingClientRect();
+$('#btn-scen').addEventListener('click', () => {
   const cats = []; NS.SCENARIOS.forEach(sc => { const c = sc.cat || 'Réseau'; if (!cats.includes(c)) cats.push(c); });
-  const items = [{ title: 'TP d\'exemple' }]; cats.forEach(c => { items.push({ title: c === 'Réseau' ? 'Section Réseau' : 'Section ' + c }); NS.SCENARIOS.filter(sc => (sc.cat || 'Réseau') === c).forEach(sc => items.push({ label: sc.title + '  —  ' + sc.level, fn: () => startScenario(sc) })); });
-  ui.menu(r.left, r.bottom + 4, items);
+  const catSel = h('select', cats.map(c => h('option', { value: c }, c)));
+  const tpSel = h('select');
+  const info = h('div.tp-preview');
+  function fillTp() {
+    clear(tpSel);
+    NS.SCENARIOS.filter(sc => (sc.cat || 'Réseau') === catSel.value).forEach(sc => tpSel.appendChild(h('option', { value: sc.id }, sc.title)));
+    updateInfo();
+  }
+  function updateInfo() {
+    const sc = SCbyId(tpSel.value); clear(info);
+    if (sc) info.appendChild(h('p.muted', h('b', sc.level + ' · ' + sc.duration), h('br'), sc.desc));
+  }
+  catSel.addEventListener('change', fillTp); tpSel.addEventListener('change', updateInfo);
+  fillTp();
+  ui.modal('TP d\'exemple', [ui.field('Section', catSel), ui.field('Sujet', tpSel), info],
+    [{ label: 'Annuler' }, { label: 'Charger', primary: true, fn: () => { const sc = SCbyId(tpSel.value); if (sc) startScenario(sc); } }]);
 });
 
 /* ------------------------------------------------ aide / couverture / fiches */

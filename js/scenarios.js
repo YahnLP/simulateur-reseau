@@ -661,6 +661,154 @@ SC.push({
   ],
 });
 
+/* ============================================================= CCNA — TP 1 */
+SC.push({
+  id: 'ccna-vlsm', title: 'Plan d\'adressage VLSM et configuration', level: 'CCNA / BTS SIO SISR', duration: '1 h', cat: 'CCNA',
+  desc: 'À partir d\'un unique réseau 192.168.10.0/24, concevez un plan d\'adressage par sous-réseaux de tailles variables (VLSM) pour deux LAN et une liaison inter-routeurs, puis configurez-le.',
+  objectives: ['Découper un réseau en sous-réseaux de tailles adaptées aux besoins (VLSM)', 'Calculer adresse réseau, plage utile, broadcast et masque pour chaque sous-réseau', 'Configurer les interfaces et le routage statique entre les sous-réseaux'],
+  steps: [
+    'Besoins à satisfaire à partir de <b>192.168.10.0/24</b> : LAN A (R1) ≤ 50 postes, LAN B (R1) ≤ 20 postes, LAN C (R2) ≤ 10 postes, liaison R1–R2 (2 adresses).',
+    'Sur papier (ou dans un tableur) : proposez un découpage VLSM — masque de chaque sous-réseau, adresse réseau, première/dernière adresse utilisable, adresse de diffusion. Commencez par le plus grand besoin.',
+    'Solution attendue : LAN A → <code>192.168.10.0/26</code> (.1 à .62), LAN B → <code>192.168.10.64/27</code> (.65 à .94), liaison R1–R2 → <code>192.168.10.96/30</code> (.97/.98), LAN C → <code>192.168.10.112/28</code> (.113 à .126).',
+    'Configurez les interfaces de R1 et R2 avec ces adresses, puis ajoutez les routes statiques nécessaires pour que chaque LAN joigne les deux autres (<code>ip route</code> sur R1 vers le LAN C via .98, et sur R2 une route par défaut vers .97).',
+    'Vérifiez avec <code>show ip route</code>, <code>show ip interface brief</code> et des <code>ping</code> croisés entre PA (LAN A), PB (LAN B) et PC (LAN C).',
+  ],
+  build(sim) {
+    const { dev, link, get } = mk(sim);
+    dev('r-2911', 'R1', 300, 100); dev('r-2911', 'R2', 600, 100);
+    dev('pc-win', 'PA', 150, 300); dev('pc-win', 'PB', 350, 300); dev('pc-win', 'PC', 600, 300);
+    link('R1', 'gi0/0', 'R2', 'gi0/0'); link('PA', 'eth0', 'R1', 'gi0/1'); link('PB', 'eth0', 'R1', 'gi0/2'); link('PC', 'eth0', 'R2', 'gi0/1');
+  },
+  solve(sim) {
+    const { get } = mk(sim);
+    cliRun(get('R1'), 'enable\nconf t\ninterface gi0/1\nip address 192.168.10.1 255.255.255.192\nno shutdown\ninterface gi0/2\nip address 192.168.10.65 255.255.255.224\nno shutdown\ninterface gi0/0\nip address 192.168.10.97 255.255.255.252\nno shutdown\nexit\nip route 192.168.10.112 255.255.255.240 192.168.10.98\nend');
+    cliRun(get('R2'), 'enable\nconf t\ninterface gi0/0\nip address 192.168.10.98 255.255.255.252\nno shutdown\ninterface gi0/1\nip address 192.168.10.113 255.255.255.240\nno shutdown\nexit\nip route 0.0.0.0 0.0.0.0 192.168.10.97\nend');
+    hostIp(get('PA'), '192.168.10.10', '26', '192.168.10.1'); hostIp(get('PB'), '192.168.10.70', '27', '192.168.10.65'); hostIp(get('PC'), '192.168.10.115', '28', '192.168.10.113');
+  },
+  checks: [
+    { label: 'LAN A reçoit bien un masque /26 (255.255.255.192)', run: c => c.get('R1').ifaceByName('gi0/1') && IP.str(c.get('R1').ifaceByName('gi0/1').mask) === '255.255.255.192' },
+    { label: 'LAN B reçoit bien un masque /27 (255.255.255.224)', run: c => c.get('R1').ifaceByName('gi0/2') && IP.str(c.get('R1').ifaceByName('gi0/2').mask) === '255.255.255.224' },
+    { label: 'PA (LAN A) joint PB (LAN B)', run: c => c.ping('PA', '192.168.10.70') },
+    { label: 'PA (LAN A) joint PC (LAN C) à travers R1 et R2', run: c => c.ping('PA', '192.168.10.115') },
+  ],
+});
+
+/* ============================================================= CCNA — TP 2 */
+SC.push({
+  id: 'ccna-portfast', title: 'Bonnes pratiques STP : PortFast et BPDU Guard', level: 'CCNA / BTS SIO SISR', duration: '45 min', cat: 'CCNA',
+  desc: 'Un port d\'accès met normalement ~30 s à passer en forwarding (écoute/apprentissage). PortFast supprime ce délai pour un poste ; BPDU Guard protège le port contre le branchement accidentel ou malveillant d\'un commutateur.',
+  objectives: ['Comprendre les états STP (blocking/listening/learning/forwarding) et leur délai', 'Configurer PortFast sur un port d\'accès pour une connexion instantanée', 'Configurer BPDU Guard et constater la mise en err-disabled du port en cas de BPDU reçue'],
+  steps: [
+    'Sans configuration, débranchez puis rebranchez le câble de PC1 sur SW1 (clic droit sur le câble) : comptez le temps avant que le ping vers la passerelle fonctionne (~30 s, passage par listening/learning).',
+    'Sur le port de PC1 (fa0/1) : <code>spanning-tree portfast</code>. Répétez le débranchement/rebranchement : la connectivité est immédiate.',
+    'Le port fa0/5 de SW1 est un port libre, réservé à un futur poste. Sécurisez-le par précaution : <code>spanning-tree portfast</code> puis <code>spanning-tree bpduguard enable</code>.',
+    'Faites <b>Vérifier mon travail</b> : la maquette simule alors le branchement d\'un commutateur non autorisé (<b>SW-PIRATE</b>) sur ce port fa0/5. Observez ensuite <code>show interfaces status</code> sur SW1 : le port passe en <b>err-disabled</b> dès qu\'il reçoit une BPDU — il est automatiquement coupé.',
+    'Pour réactiver le port après retrait de l\'équipement non autorisé : <code>shutdown</code> puis <code>no shutdown</code> sur l\'interface.',
+  ],
+  build(sim) {
+    const { dev, link, get } = mk(sim);
+    dev('sw-2960', 'SW1', 350, 150); dev('pc-win', 'PC1', 200, 320);
+    link('PC1', 'eth0', 'SW1', 'fa0/1');
+    hostIp(get('PC1'), '192.168.1.10', '24');
+    cliRun(get('SW1'), 'enable\nconf t\ninterface vlan 1\nip address 192.168.1.1 255.255.255.0\nno shutdown\nend');
+  },
+  solve(sim) {
+    const { get } = mk(sim);
+    cliRun(get('SW1'), 'enable\nconf t\ninterface fa0/1\nspanning-tree portfast\nexit\ninterface fa0/5\nspanning-tree portfast\nspanning-tree bpduguard enable\nend');
+  },
+  checks: [
+    { label: 'PortFast est actif sur le port de PC1', run: c => !!c.get('SW1').findPort('fa0/1').portfast },
+    { label: 'BPDU Guard désactive automatiquement le port dès qu\'un commutateur non autorisé s\'y branche', run: c => {
+      const sw = c.get('SW1');
+      if (!c.get('SW-PIRATE')) {
+        const d = NS.createDevice(c.sim, 'sw-2960', { name: 'SW-PIRATE', x: 550, y: 320 });
+        c.sim.connect(d.findPort('fa0/1'), sw.findPort('fa0/5'));
+        cliRun(d, 'enable\nconf t\nspanning-tree vlan 1 priority 0\nend');
+      }
+      c.wait(6000);
+      return sw.findPort('fa0/5').errdis === true;
+    } },
+  ],
+});
+
+/* ============================================================= Stormshield — TP 1 */
+SC.push({
+  id: 'ss-politique', title: 'Politique de filtrage Stormshield : moindre privilège', level: 'Habilitation Stormshield (CSNA) / BTS SIO', duration: '1 h', cat: 'Stormshield',
+  desc: 'Un pare-feu Stormshield est livré avec une politique par défaut trop permissive (tout le LAN peut tout faire vers le WAN et la DMZ). Reconstruisez une politique de filtrage minimale, ordonnée, selon le principe du moindre privilège.',
+  objectives: ['Comprendre l\'ordre d\'évaluation des règles et le refus implicite en fin de politique', 'Remplacer une politique permissive par des règles explicites et minimales', 'Vérifier qu\'un flux non autorisé est bien bloqué (et journalisé)'],
+  steps: [
+    'Ouvrez <b>FW1</b> → onglet <b>Règles de filtrage</b>. La politique actuelle autorise tout le LAN vers le WAN et vers la DMZ, et toute la DMZ vers le WAN : c\'est excessif pour un serveur qui ne doit que répondre au web.',
+    'Supprimez les règles trop larges. Ajoutez des règles précises : LAN → WAN en <b>TCP, ports 80 et 443</b> seulement (navigation) ; LAN → DMZ en <b>TCP, port 80</b> seulement (accès au site interne) ; rien d\'autre depuis la DMZ vers le WAN (le serveur ne doit pas initier de connexions sortantes).',
+    'Onglet <b>NAT / redirections</b> : publiez le port 80 du serveur de la DMZ vers l\'adresse publique du pare-feu, et ajoutez la règle <b>WAN → DMZ, TCP, port 80</b>.',
+    'Testez : PC1 (LAN) accède toujours au site de la DMZ. Le serveur de la DMZ ne peut plus initier de connexion vers le WAN (testez un ping sortant depuis le serveur : refusé).',
+    'Onglet <b>Journal</b> : retrouvez les entrées « bloqué » qui confirment que le refus implicite fonctionne bien pour tout ce qui n\'est pas explicitement autorisé.',
+  ],
+  build(sim) {
+    const { dev, link, get } = mk(sim);
+    dev('fw-sn210', 'FW1', 380, 200); dev('sw-8p', 'SW1', 160, 200); dev('pc-win', 'PC1', 160, 360); dev('srv-linux', 'SRVWEB', 380, 380); dev('inet', 'FAI', 620, 200); dev('pc-linux', 'CLIENT', 820, 200);
+    link('SW1', 'port1', 'FW1', 'in'); link('PC1', 'eth0', 'SW1', 'port2'); link('SRVWEB', 'ens33', 'FW1', 'dmz1'); link('FW1', 'out', 'FAI', 'gi0/0'); link('FAI', 'gi0/1', 'CLIENT', 'ens33');
+    cliRun(get('FAI'), 'enable\nconf t\ninterface gi0/0\nip address 203.0.113.1 255.255.255.252\nno shutdown\ninterface gi0/1\nip address 198.51.100.1 255.255.255.0\nno shutdown\nend');
+    hostIp(get('CLIENT'), '198.51.100.20', '24', '198.51.100.1'); hostIp(get('PC1'), '192.168.1.10', '24', '192.168.1.254');
+    const f = get('FW1'); const o = f.ifaceByName('out'); f.enableDhcp(o, false); o.ip = IP.parse('203.0.113.2'); o.mask = IP.parseMask('30');
+    f.statics = f.statics.filter(s => !(s.net === 0 && s.mask === 0)); f.statics.push({ net: 0, mask: 0, nh: IP.parse('203.0.113.1'), iface: null, ad: 1 });
+    const s = get('SRVWEB'); hostIp(s, '172.16.0.10', '24', '172.16.0.254'); s.httpd.start();
+    s.httpd.pages['/'] = { type: 'text/html; charset=utf-8', body: '<html><body><h1>Serveur en DMZ</h1></body></html>', _custom: true };
+  },
+  solve(sim) {
+    const { get } = mk(sim); const f = get('FW1');
+    f.rules = [
+      { on: true, action: 'pass', from: 'LAN', to: 'WAN', proto: 'tcp', src: 'any', dst: 'any', dport: '80,443', comment: 'Navigation web du LAN' },
+      { on: true, action: 'pass', from: 'LAN', to: 'DMZ', proto: 'tcp', src: 'any', dst: 'any', dport: '80', comment: 'LAN vers le site interne' },
+      { on: true, action: 'pass', from: 'WAN', to: 'DMZ', proto: 'tcp', src: 'any', dst: 'any', dport: '80', comment: 'Publication du site web' },
+    ];
+    f.forwards = [{ proto: 'tcp', port: 80, toIp: '172.16.0.10', toPort: 80 }];
+    f.natMasq = [{ from: 'LAN', to: 'WAN' }]; f.rebuildNat();
+    /* la DMZ garde son marquage NAT « inside » pour que la réponse d'une connexion publiée
+       (WAN → DMZ) soit correctement retraduite au retour, sans pour autant lui donner
+       de règle de masquerade dynamique : la DMZ ne peut donc pas initier de nouvelles
+       connexions sortantes, seules les réponses aux connexions publiées passent. */
+    f.ifaceByName('dmz1').nat = 'inside';
+  },
+  checks: [
+    { label: 'PC1 (LAN) accède toujours au site de la DMZ', run: c => { const r = c.http('PC1', 'http://172.16.0.10'); return !!r && r.status === 200; } },
+    { label: 'Le serveur de la DMZ ne peut plus initier de connexion vers le WAN', run: c => !c.ping('SRVWEB', '198.51.100.20', 2) },
+    { label: 'Le client Internet accède au site publié via l\'adresse publique du pare-feu', run: c => { const r = c.http('CLIENT', 'http://203.0.113.2'); return !!r && r.status === 200; } },
+  ],
+});
+
+/* ============================================================= Stormshield — TP 2 */
+SC.push({
+  id: 'ss-diag', title: 'Diagnostic Stormshield : lecture du journal de filtrage', level: 'Habilitation Stormshield (CSNA) / BTS SIO', duration: '45 min', cat: 'Stormshield',
+  desc: 'Suite à une intervention, plus personne sur le LAN n\'accède à Internet. À partir du seul journal du pare-feu, identifiez la règle manquante et corrigez la politique.',
+  objectives: ['Lire et interpréter le journal de filtrage d\'un pare-feu (action, zones, motif)', 'Faire le lien entre un flux bloqué dans le journal et la règle à ajouter', 'Corriger une politique de filtrage de façon ciblée, sans tout réautoriser'],
+  steps: [
+    'Sur PC1, testez un <code>ping</code> vers la passerelle du FAI, ou ouvrez un site : la connexion échoue.',
+    'Ouvrez <b>FW1</b> → onglet <b>Journal</b> : repérez les entrées « bloqué » concernant PC1, et notez la zone source, la zone destination et le motif indiqué (aucune règle ne correspond).',
+    'Onglet <b>Règles de filtrage</b> : la politique actuelle ne contient qu\'une règle LAN → DMZ. La règle LAN → WAN a été supprimée par erreur.',
+    'Ajoutez une règle <b>LAN → WAN, autoriser, tout protocole</b> (ou plus précisément TCP/UDP/ICMP selon les besoins), puis revérifiez le journal : les nouvelles tentatives apparaissent désormais en « autorisé ».',
+    'Testez à nouveau depuis PC1 : la connectivité vers Internet est rétablie.',
+  ],
+  build(sim) {
+    const { dev, link, get } = mk(sim);
+    dev('fw-sn210', 'FW1', 380, 200); dev('sw-8p', 'SW1', 160, 200); dev('pc-win', 'PC1', 160, 360); dev('inet', 'FAI', 620, 200);
+    link('SW1', 'port1', 'FW1', 'in'); link('PC1', 'eth0', 'SW1', 'port2'); link('FW1', 'out', 'FAI', 'gi0/0');
+    cliRun(get('FAI'), 'enable\nconf t\ninterface gi0/0\nip address 203.0.113.1 255.255.255.252\nno shutdown\nend');
+    hostIp(get('PC1'), '192.168.1.10', '24', '192.168.1.254');
+    const f = get('FW1'); const o = f.ifaceByName('out'); f.enableDhcp(o, false); o.ip = IP.parse('203.0.113.2'); o.mask = IP.parseMask('30');
+    f.statics = f.statics.filter(s => !(s.net === 0 && s.mask === 0)); f.statics.push({ net: 0, mask: 0, nh: IP.parse('203.0.113.1'), iface: null, ad: 1 });
+    f.rules = [{ on: true, action: 'pass', from: 'LAN', to: 'DMZ', proto: 'any', src: 'any', dst: 'any', dport: 'any', comment: 'Accès DMZ (sans objet ici)' }];
+    f.natMasq = [{ from: 'LAN', to: 'WAN' }]; f.rebuildNat();
+  },
+  solve(sim) {
+    const { get } = mk(sim); const f = get('FW1');
+    f.rules.push({ on: true, action: 'pass', from: 'LAN', to: 'WAN', proto: 'any', src: 'any', dst: 'any', dport: 'any', comment: 'Accès Internet du LAN (rétabli)' });
+  },
+  checks: [
+    { label: 'Avant correction : le journal contient un flux LAN→WAN bloqué', run: c => { c.ping('PC1', '203.0.113.1', 1); c.wait(500); return c.get('FW1').fwlog.some(e => e.action === 'block' && e.zin === 'LAN'); } },
+    { label: 'Après correction : PC1 joint de nouveau le FAI', run: c => c.ping('PC1', '203.0.113.1') },
+  ],
+});
+
 /* ================================================================== matrice de couverture */
 NS.COVERAGE = {
   note: 'Thèmes techniques d\'usage courant dans les formations. Le rattachement aux blocs/compétences officiels est indicatif : à confronter au référentiel officiel de votre section.',
