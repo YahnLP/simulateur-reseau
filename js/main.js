@@ -60,6 +60,9 @@ app.onChange = () => { autosave(); };
 
 /* ------------------------------------------------ TP */
 const SCbyId = id => NS.SCENARIOS.find(s => s.id === id) || null;
+const DIFF_LABEL = { 1: 'Facile', 2: 'Intermédiaire', 3: 'Avancé' };
+function diffStars(n) { n = n || 1; return '★'.repeat(n) + '☆'.repeat(3 - n); }
+function diffText(n) { return diffStars(n) + ' ' + (DIFF_LABEL[n] || DIFF_LABEL[1]); }
 function startScenario(sc) {
   const go = () => {
     resetAll(); sim.opts.strictCables = false; $('#opt-strict').checked = false;
@@ -73,7 +76,7 @@ function renderTp() {
   const box = $('#tppane'); clear(box); const sc = app.tpCurrent;
   if (!sc) { box.appendChild(h('div', h('h3', 'Aucun TP chargé'), h('p.muted', 'Utilisez « TP d\'exemple » en haut de l\'écran pour charger un sujet avec sa topologie de départ, ses étapes, une correction et des vérifications automatiques.'))); return; }
   const res = h('div.tpres');
-  box.appendChild(h('div.tp', h('h3', sc.title), h('span.lvl', sc.level + ' · ' + sc.duration), h('p', sc.desc),
+  box.appendChild(h('div.tp', h('h3', sc.title), h('span.lvl', sc.level + ' · ' + sc.duration + ' · ' + diffText(sc.diff)), h('p', sc.desc),
     h('h4', 'Objectifs'), h('ul', sc.objectives.map(o => h('li', o))), h('h4', 'Déroulé'), h('ol', sc.steps.map(s => h('li', { html: s }))),
     h('div.btns', h('button.primary', { onclick: () => { res.textContent = 'Vérification en cours…'; setTimeout(() => runChecks(sc, res), 20); } }, '✔ Vérifier mon travail'), sc.solve ? h('button', { onclick: () => ui.confirmBox('Correction', 'Appliquer la configuration corrigée ? Votre travail sera écrasé.', () => { sc.solve(sim); app.refresh(); ui.toast('Correction appliquée', 'ok'); }) }, 'Charger la correction') : h('span.muted.small', 'Pas de correction automatique : ce TP est un TP d\'observation.'), h('button', { onclick: () => startScenarioNow(sc) }, 'Recommencer')), res));
 }
@@ -91,12 +94,12 @@ $('#btn-scen').addEventListener('click', () => {
   const info = h('div.tp-preview');
   function fillTp() {
     clear(tpSel);
-    NS.SCENARIOS.filter(sc => (sc.cat || 'Réseau') === catSel.value).forEach(sc => tpSel.appendChild(h('option', { value: sc.id }, sc.title)));
+    NS.SCENARIOS.filter(sc => (sc.cat || 'Réseau') === catSel.value).forEach(sc => tpSel.appendChild(h('option', { value: sc.id }, diffStars(sc.diff) + ' ' + sc.title)));
     updateInfo();
   }
   function updateInfo() {
     const sc = SCbyId(tpSel.value); clear(info);
-    if (sc) info.appendChild(h('p.muted', h('b', sc.level + ' · ' + sc.duration), h('br'), sc.desc));
+    if (sc) info.appendChild(h('p.muted', h('b', diffText(sc.diff) + ' · ' + sc.level + ' · ' + sc.duration), h('br'), sc.desc));
   }
   catSel.addEventListener('change', fillTp); tpSel.addEventListener('change', updateInfo);
   fillTp();

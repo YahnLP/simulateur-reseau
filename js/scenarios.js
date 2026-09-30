@@ -35,7 +35,7 @@ NS.checker = checker;
 
 /* ================================================================== TP 1 */
 SC.push({
-  id: 'lan', title: 'Réseau local : adressage IP, ARP et ping', level: 'Bac Pro CIEL', duration: '45 min',
+  id: 'lan', diff: 1, title: 'Réseau local : adressage IP, ARP et ping', level: 'Bac Pro CIEL', duration: '45 min',
   desc: 'Trois postes reliés à un switch : configurer les adresses IP, tester la connectivité et observer ARP/ICMP avec l\'analyseur.',
   objectives: ['Configurer une adresse IPv4 statique (adresse, masque)', 'Tester avec ping et lire ipconfig / ip a', 'Expliquer le rôle d\'ARP et lire une trame Ethernet/ARP/ICMP'],
   steps: [
@@ -56,7 +56,7 @@ SC.push({
 
 /* ================================================================== TP 2 */
 SC.push({
-  id: 'dhcp-dns-web', title: 'DHCP, DNS et serveur Web', level: 'Bac Pro CIEL / BTS SIO', duration: '1 h',
+  id: 'dhcp-dns-web', diff: 2, title: 'DHCP, DNS et serveur Web', level: 'Bac Pro CIEL / BTS SIO', duration: '1 h',
   desc: 'Un serveur Linux distribue les adresses (DHCP), résout les noms (DNS) et publie un site (HTTP). Observation de l\'échange DORA et des requêtes DNS/HTTP.',
   objectives: ['Configurer un serveur DHCP (pool, passerelle, DNS, exclusions)', 'Créer une zone DNS (A) et publier une page web', 'Décrire DORA, la requête DNS et la requête HTTP dans l\'analyseur'],
   steps: [
@@ -85,7 +85,7 @@ SC.push({
 
 /* ================================================================== TP 3 */
 SC.push({
-  id: 'vlan', title: 'VLAN, trunk 802.1Q et routage inter-VLAN', level: 'BTS SIO SISR / Bac Pro CIEL', duration: '1 h 30',
+  id: 'vlan', diff: 2, title: 'VLAN, trunk 802.1Q et routage inter-VLAN', level: 'BTS SIO SISR / Bac Pro CIEL', duration: '1 h 30',
   desc: 'Deux switches, deux VLAN (COMPTA et RH) et un routeur « on a stick » : segmentation, trunk, sous-interfaces, isolation.',
   objectives: ['Créer des VLAN, affecter des ports en accès, configurer un trunk', 'Configurer des sous-interfaces 802.1Q sur un routeur', 'Observer l\'étiquette 802.1Q dans l\'analyseur et démontrer l\'isolation entre VLAN'],
   steps: [
@@ -138,7 +138,7 @@ end`);
 
 /* ================================================================== TP 4 */
 SC.push({
-  id: 'nat-acl', title: 'Accès Internet : NAT/PAT, routage par défaut et ACL', level: 'BTS SIO SISR', duration: '1 h 30',
+  id: 'nat-acl', diff: 2, title: 'Accès Internet : NAT/PAT, routage par défaut et ACL', level: 'BTS SIO SISR', duration: '1 h 30',
   desc: 'Un routeur d\'agence partage une adresse publique (PAT) et filtre par ACL. Un serveur « public » derrière le FAI répond en HTTP et DNS.',
   objectives: ['Configurer routage par défaut, NAT overload et ACL nommée', 'Lire la table de traduction NAT', 'Comparer les adresses source avant/après NAT dans l\'analyseur'],
   steps: [
@@ -185,7 +185,7 @@ end`);
 
 /* ================================================================== TP 5 */
 SC.push({
-  id: 'routage', title: 'Routage : statique puis RIP (3 routeurs)', level: 'BTS SIO SISR', duration: '1 h',
+  id: 'routage', diff: 2, title: 'Routage : statique puis RIP (3 routeurs)', level: 'BTS SIO SISR', duration: '1 h',
   desc: 'Trois routeurs en ligne, deux réseaux terminaux : routes statiques, puis routage dynamique RIPv2 et lecture de la table de routage.',
   objectives: ['Lire une table de routage (C, S, R)', 'Configurer routes statiques puis RIP v2', 'Observer les mises à jour RIP (UDP 520, multicast 224.0.0.9)'],
   steps: [
@@ -211,7 +211,7 @@ SC.push({
 
 /* ================================================================== TP 6 */
 SC.push({
-  id: 'stp', title: 'Boucle de commutation et Spanning Tree (STP)', level: 'BTS SIO SISR', duration: '45 min',
+  id: 'stp', diff: 2, title: 'Boucle de commutation et Spanning Tree (STP)', level: 'BTS SIO SISR', duration: '45 min',
   desc: 'Trois switches en triangle : élection du root bridge, ports bloqués, BPDU. Puis provoquez une tempête de broadcast en supprimant STP.',
   objectives: ['Identifier root bridge, ports racine/désignés/bloqués', 'Lire une BPDU (root ID, coût, port ID)', 'Constater l\'effet d\'une boucle sans STP'],
   steps: [
@@ -233,7 +233,7 @@ SC.push({
 
 /* ================================================================== TP 7 */
 SC.push({
-  id: 'sniff', title: 'Analyse de trames : hub, switch, Telnet et SSH', level: 'Bac Pro CIEL (cybersécurité) / BTS SIO', duration: '1 h',
+  id: 'sniff', diff: 1, title: 'Analyse de trames : hub, switch, Telnet et SSH', level: 'Bac Pro CIEL (cybersécurité) / BTS SIO', duration: '1 h',
   desc: 'PC2 « écoute » sur un hub pendant que PC1 administre un routeur en Telnet, puis en SSH. Mise en évidence du risque du clair et de l\'intérêt du switch.',
   objectives: ['Comparer hub (répéteur) et switch (commutation)', 'Retrouver un mot de passe Telnet dans une capture (Suivre le flux TCP)', 'Constater que SSH chiffre les échanges'],
   steps: [
@@ -256,7 +256,7 @@ SC.push({
 
 /* ================================================================== TP 8 */
 SC.push({
-  id: 'dmz', title: 'Pare-feu, DMZ et redirection de port (Stormshield SN210)', level: 'BTS SIO SISR / Bac Pro CIEL', duration: '1 h 30',
+  id: 'dmz', diff: 2, title: 'Pare-feu, DMZ et redirection de port (Stormshield SN210)', level: 'BTS SIO SISR / Bac Pro CIEL', duration: '1 h 30',
   desc: 'Un pare-feu à trois zones (LAN, DMZ, WAN) : politique de filtrage, masquerade et publication d\'un serveur web de la DMZ vers Internet.',
   objectives: ['Définir des zones et une politique de filtrage ordonnée', 'Publier un service (redirection de port + règle WAN→DMZ)', 'Vérifier le filtrage à états et lire le journal du pare-fu'],
   steps: [
@@ -285,7 +285,7 @@ SC.push({
 
 /* ================================================================== TP 9 */
 SC.push({
-  id: 'wifi', title: 'Box, Wi-Fi et réseau domestique / TPE', level: 'Bac Pro CIEL', duration: '45 min',
+  id: 'wifi', diff: 1, title: 'Box, Wi-Fi et réseau domestique / TPE', level: 'Bac Pro CIEL', duration: '45 min',
   desc: 'Une box (routeur/DHCP/NAT) alimente un poste filaire et une borne Wi-Fi ; deux portables s\'associent avec un SSID et une clé.',
   objectives: ['Configurer SSID et clé d\'une borne, associer des clients Wi-Fi', 'Identifier la configuration d\'une box (LAN, DHCP, NAT)', 'Vérifier l\'adressage obtenu par DHCP'],
   steps: [
@@ -306,7 +306,7 @@ function hostIpWifi(l) { const w = l.ifaceList().find(i => i.port && i.port.medi
 
 /* ================================================================== TP 10 */
 SC.push({
-  id: 'ospf', title: 'Routage dynamique OSPF (aire unique)', level: 'BTS SIO SISR', duration: '1 h 30',
+  id: 'ospf', diff: 3, title: 'Routage dynamique OSPF (aire unique)', level: 'BTS SIO SISR', duration: '1 h 30',
   desc: 'Trois routeurs en triangle, chacun avec un LAN : configuration d\'OSPF en aire 0, observation des voisins, de la base de données et de la reconvergence après panne de lien.',
   objectives: ['Activer OSPF et annoncer des réseaux (network / wildcard / area)', 'Lire show ip ospf neighbor / database / route', 'Constater la reconvergence automatique après une panne de lien'],
   steps: [
@@ -337,7 +337,7 @@ SC.push({
 
 /* ================================================================== TP 11 */
 SC.push({
-  id: 'vpn-site', title: 'VPN site à site (GRE et IPsec)', level: 'BTS SIO SISR', duration: '1 h 30',
+  id: 'vpn-site', diff: 3, title: 'VPN site à site (GRE et IPsec)', level: 'BTS SIO SISR', duration: '1 h 30',
   desc: 'Deux sites reliés par Internet (simulé) : tunnel GRE pour faire transiter des réseaux privés, puis chiffrement IPsec (ISAKMP/IKEv1 + ESP) du même trafic.',
   objectives: ['Comprendre pourquoi des réseaux privés ne se joignent pas directement à travers Internet', 'Configurer un tunnel GRE et une route dessus', 'Configurer un tunnel IPsec site-à-site (crypto map) et vérifier les compteurs SA'],
   steps: [
@@ -367,7 +367,7 @@ SC.push({
 
 /* ================================================================== TP 12 */
 SC.push({
-  id: 'supervision', title: 'Supervision : SNMP et journalisation syslog', level: 'BTS SIO SISR', duration: '1 h',
+  id: 'supervision', diff: 2, title: 'Supervision : SNMP et journalisation syslog', level: 'BTS SIO SISR', duration: '1 h',
   desc: 'Un serveur de supervision interroge un routeur en SNMP (get/walk) et reçoit ses journaux syslog et ses traps en cas d\'incident (coupure de lien).',
   objectives: ['Configurer les communautés SNMP (RO/RW) et l\'envoi de traps', 'Interroger un équipement en SNMP (sysDescr, table des interfaces) depuis un outil de supervision', 'Configurer et lire la journalisation syslog, corréler un événement (coupure de lien) avec sa trap et son message'],
   steps: [
@@ -398,7 +398,7 @@ SC.push({
 
 /* ================================================================== TP 13 */
 SC.push({
-  id: 'ipv6', title: 'IPv6 : SLAAC, adressage manuel et connectivité', level: 'BTS SIO SISR / Bac Pro CIEL', duration: '1 h',
+  id: 'ipv6', diff: 2, title: 'IPv6 : SLAAC, adressage manuel et connectivité', level: 'BTS SIO SISR / Bac Pro CIEL', duration: '1 h',
   desc: 'Un routeur diffuse un préfixe IPv6 par Router Advertisement : les postes s\'auto-configurent (SLAAC), un poste reçoit une adresse manuelle. Observation dans l\'analyseur (RA, NDP).',
   objectives: ['Activer le routage IPv6 et annoncer un préfixe (RA)', 'Comprendre l\'auto-configuration SLAAC (Linux et Windows)', 'Lire une adresse IPv6 (portée lien-local vs globale) et un message NDP'],
   steps: [
@@ -424,7 +424,7 @@ SC.push({
 
 /* ================================================================== TP 14 */
 SC.push({
-  id: 'etherchannel', title: 'Haute disponibilité : RSTP et agrégation de liens (EtherChannel)', level: 'BTS SIO SISR', duration: '1 h',
+  id: 'etherchannel', diff: 2, title: 'Haute disponibilité : RSTP et agrégation de liens (EtherChannel)', level: 'BTS SIO SISR', duration: '1 h',
   desc: 'Deux switches reliés par deux câbles : d\'abord observation du blocage STP classique, puis agrégation LACP en EtherChannel pour utiliser les deux liens et tolérer la panne de l\'un d\'eux.',
   objectives: ['Constater qu\'un lien parallèle est bloqué par STP (évite la boucle)', 'Configurer un EtherChannel LACP (channel-group ... mode active) et l\'affecter en trunk', 'Vérifier la tolérance de panne : la perte d\'un lien membre ne coupe pas le trafic'],
   steps: [
@@ -456,7 +456,7 @@ SC.push({
 
 /* ================================================================== TP 15 */
 SC.push({
-  id: 'radius-8021x', title: 'Authentification réseau 802.1X avec un serveur RADIUS', level: 'BTS SIO SISR', duration: '1 h 30',
+  id: 'radius-8021x', diff: 3, title: 'Authentification réseau 802.1X avec un serveur RADIUS', level: 'BTS SIO SISR', duration: '1 h 30',
   desc: 'Un port de switch est protégé par 802.1X : un poste doit s\'authentifier auprès d\'un serveur RADIUS (FreeRADIUS) avant que son trafic ne soit autorisé. Attribution dynamique de VLAN selon l\'utilisateur.',
   objectives: ['Comprendre les rôles supplicant / authenticator / serveur d\'authentification', 'Configurer AAA, RADIUS et 802.1X sur un commutateur Cisco', 'Constater le blocage du port avant authentification puis l\'attribution dynamique de VLAN après authentification'],
   steps: [
@@ -488,7 +488,7 @@ SC.push({
 
 /* ================================================================== TP 16 */
 SC.push({
-  id: 'voip-qos', title: 'Téléphonie sur IP (SIP) et qualité de service', level: 'BTS SIO SISR', duration: '1 h 30',
+  id: 'voip-qos', diff: 3, title: 'Téléphonie sur IP (SIP) et qualité de service', level: 'BTS SIO SISR', duration: '1 h 30',
   desc: 'Deux téléphones IP enregistrés sur un PBX (Asterisk) au VLAN voix (appris par CDP) passent un appel. On dégrade le lien (charge de données) pour montrer l\'intérêt de la QoS (file prioritaire LLQ).',
   objectives: ['Comprendre l\'enregistrement SIP (digest) et l\'établissement d\'un appel (INVITE/RTP)', 'Configurer le VLAN voix sur un port de switch et l\'observer via CDP', 'Mettre en œuvre une politique de qualité de service (LLQ) et en mesurer l\'effet sur le MOS'],
   steps: [
@@ -521,7 +521,7 @@ SC.push({
 
 /* ================================================================== TP 17 */
 SC.push({
-  id: 'aos6400', title: 'Commutateur Alcatel-Lucent OmniSwitch 6400-P48 (AOS)', level: 'BTS SIO SISR', duration: '1 h',
+  id: 'aos6400', diff: 2, title: 'Commutateur Alcatel-Lucent OmniSwitch 6400-P48 (AOS)', level: 'BTS SIO SISR', duration: '1 h',
   desc: 'Découverte de la CLI AOS (différente d\'IOS : pas de mode enable/configure) sur un OmniSwitch 6400-P48 : VLAN, interfaces IP, agrégation LACP et alimentation PoE d\'un téléphone.',
   objectives: ['Repérer les différences entre la CLI AOS et la CLI Cisco IOS', 'Créer des VLAN et des interfaces IP (SVI) en AOS', 'Configurer un agrégat LACP (linkagg) et gérer l\'alimentation PoE (lanpower) d\'un port'],
   steps: [
@@ -551,7 +551,7 @@ SC.push({
 
 /* ============================================================= Cybersécurité — TP 1 */
 SC.push({
-  id: 'cyber-recon', title: 'Reconnaissance réseau et mots de passe faibles', level: 'Bac Pro CIEL / BTS SIO — initiation', duration: '1 h', cat: 'Cybersécurité',
+  id: 'cyber-recon', diff: 1, title: 'Reconnaissance réseau et mots de passe faibles', level: 'Bac Pro CIEL / BTS SIO — initiation', duration: '1 h', cat: 'Cybersécurité',
   desc: 'Un poste « attaquant » cartographie les services d\'un serveur (scan de ports) puis exploite l\'usage de Telnet en clair et un mot de passe faible pour accéder à un équipement.',
   objectives: ['Utiliser un outil de reconnaissance (scan de ports) et interpréter son résultat', 'Comprendre le risque des protocoles non chiffrés (Telnet) et des mots de passe faibles', 'Identifier des contre-mesures simples (SSH, comptes/mots de passe robustes, filtrage)'],
   steps: [
@@ -578,7 +578,7 @@ SC.push({
 
 /* ============================================================= Cybersécurité — TP 2 */
 SC.push({
-  id: 'cyber-arpmitm', title: 'Usurpation ARP et interception (Man-in-the-Middle)', level: 'BTS SIO — Cybersécurité', duration: '1 h', cat: 'Cybersécurité',
+  id: 'cyber-arpmitm', diff: 2, title: 'Usurpation ARP et interception (Man-in-the-Middle)', level: 'BTS SIO — Cybersécurité', duration: '1 h', cat: 'Cybersécurité',
   desc: 'Sur un réseau local non protégé, un poste « attaquant » empoisonne le cache ARP d\'une victime pour se faire passer pour la passerelle et intercepter son trafic.',
   objectives: ['Comprendre le fonctionnement du protocole ARP et sa vulnérabilité de base (absence d\'authentification)', 'Réaliser une usurpation ARP (ARP spoofing) en environnement isolé et observer son effet', 'Connaître les contre-mesures (Dynamic ARP Inspection, ports statiques, surveillance du cache ARP)'],
   steps: [
@@ -608,7 +608,7 @@ SC.push({
 
 /* ============================================================= Cybersécurité — TP 3 */
 SC.push({
-  id: 'cyber-macflood', title: 'Saturation de la table MAC et port-security', level: 'BTS SIO — Cybersécurité', duration: '45 min', cat: 'Cybersécurité',
+  id: 'cyber-macflood', diff: 2, title: 'Saturation de la table MAC et port-security', level: 'BTS SIO — Cybersécurité', duration: '45 min', cat: 'Cybersécurité',
   desc: 'Un poste inonde un commutateur de trames à adresses MAC source aléatoires jusqu\'à saturer sa table d\'apprentissage (attaque « CAM overflow »/MAC flooding), ce qui le fait se comporter comme un hub. Mise en œuvre du port-security en contre-mesure.',
   objectives: ['Comprendre la capacité limitée de la table d\'adresses MAC (CAM) d\'un commutateur', 'Constater qu\'un commutateur saturé inonde le trafic (perte de confidentialité, comme un hub)', 'Configurer le port-security (nombre maximal d\'adresses MAC par port) comme contre-mesure'],
   steps: [
@@ -637,7 +637,7 @@ SC.push({
 
 /* ============================================================= Cybersécurité — TP 4 */
 SC.push({
-  id: 'cyber-dhcprogue', title: 'Serveur DHCP indésirable (rogue DHCP)', level: 'BTS SIO — Cybersécurité', duration: '45 min', cat: 'Cybersécurité',
+  id: 'cyber-dhcprogue', diff: 1, title: 'Serveur DHCP indésirable (rogue DHCP)', level: 'BTS SIO — Cybersécurité', duration: '45 min', cat: 'Cybersécurité',
   desc: 'Un deuxième routeur, mal intentionné ou mal configuré, distribue lui aussi des adresses IP sur le même réseau local et impose sa propre passerelle : les postes qui l\'obtiennent voient leur trafic détourné.',
   objectives: ['Comprendre pourquoi DHCP est un protocole « de confiance » (premier serveur qui répond) et donc vulnérable', 'Observer l\'effet d\'un serveur DHCP non autorisé sur le réseau (mauvaise passerelle/DNS)', 'Connaître la contre-mesure standard : DHCP snooping (ports « de confiance » uniquement)'],
   steps: [
@@ -663,7 +663,7 @@ SC.push({
 
 /* ============================================================= CCNA — TP 1 */
 SC.push({
-  id: 'ccna-vlsm', title: 'Plan d\'adressage VLSM et configuration', level: 'CCNA / BTS SIO SISR', duration: '1 h', cat: 'CCNA',
+  id: 'ccna-vlsm', diff: 2, title: 'Plan d\'adressage VLSM et configuration', level: 'CCNA / BTS SIO SISR', duration: '1 h', cat: 'CCNA',
   desc: 'À partir d\'un unique réseau 192.168.10.0/24, concevez un plan d\'adressage par sous-réseaux de tailles variables (VLSM) pour deux LAN et une liaison inter-routeurs, puis configurez-le.',
   objectives: ['Découper un réseau en sous-réseaux de tailles adaptées aux besoins (VLSM)', 'Calculer adresse réseau, plage utile, broadcast et masque pour chaque sous-réseau', 'Configurer les interfaces et le routage statique entre les sous-réseaux'],
   steps: [
@@ -695,7 +695,7 @@ SC.push({
 
 /* ============================================================= CCNA — TP 2 */
 SC.push({
-  id: 'ccna-portfast', title: 'Bonnes pratiques STP : PortFast et BPDU Guard', level: 'CCNA / BTS SIO SISR', duration: '45 min', cat: 'CCNA',
+  id: 'ccna-portfast', diff: 1, title: 'Bonnes pratiques STP : PortFast et BPDU Guard', level: 'CCNA / BTS SIO SISR', duration: '45 min', cat: 'CCNA',
   desc: 'Un port d\'accès met normalement ~30 s à passer en forwarding (écoute/apprentissage). PortFast supprime ce délai pour un poste ; BPDU Guard protège le port contre le branchement accidentel ou malveillant d\'un commutateur.',
   objectives: ['Comprendre les états STP (blocking/listening/learning/forwarding) et leur délai', 'Configurer PortFast sur un port d\'accès pour une connexion instantanée', 'Configurer BPDU Guard et constater la mise en err-disabled du port en cas de BPDU reçue'],
   steps: [
@@ -733,7 +733,7 @@ SC.push({
 
 /* ============================================================= Stormshield — TP 1 */
 SC.push({
-  id: 'ss-politique', title: 'Politique de filtrage Stormshield : moindre privilège', level: 'Habilitation Stormshield (CSNA) / BTS SIO', duration: '1 h', cat: 'Stormshield',
+  id: 'ss-politique', diff: 2, title: 'Politique de filtrage Stormshield : moindre privilège', level: 'Habilitation Stormshield (CSNA) / BTS SIO', duration: '1 h', cat: 'Stormshield',
   desc: 'Un pare-feu Stormshield est livré avec une politique par défaut trop permissive (tout le LAN peut tout faire vers le WAN et la DMZ). Reconstruisez une politique de filtrage minimale, ordonnée, selon le principe du moindre privilège.',
   objectives: ['Comprendre l\'ordre d\'évaluation des règles et le refus implicite en fin de politique', 'Remplacer une politique permissive par des règles explicites et minimales', 'Vérifier qu\'un flux non autorisé est bien bloqué (et journalisé)'],
   steps: [
@@ -778,7 +778,7 @@ SC.push({
 
 /* ============================================================= Stormshield — TP 2 */
 SC.push({
-  id: 'ss-diag', title: 'Diagnostic Stormshield : lecture du journal de filtrage', level: 'Habilitation Stormshield (CSNA) / BTS SIO', duration: '45 min', cat: 'Stormshield',
+  id: 'ss-diag', diff: 1, title: 'Diagnostic Stormshield : lecture du journal de filtrage', level: 'Habilitation Stormshield (CSNA) / BTS SIO', duration: '45 min', cat: 'Stormshield',
   desc: 'Suite à une intervention, plus personne sur le LAN n\'accède à Internet. À partir du seul journal du pare-feu, identifiez la règle manquante et corrigez la politique.',
   objectives: ['Lire et interpréter le journal de filtrage d\'un pare-feu (action, zones, motif)', 'Faire le lien entre un flux bloqué dans le journal et la règle à ajouter', 'Corriger une politique de filtrage de façon ciblée, sans tout réautoriser'],
   steps: [
@@ -806,6 +806,192 @@ SC.push({
   checks: [
     { label: 'Avant correction : le journal contient un flux LAN→WAN bloqué', run: c => { c.ping('PC1', '203.0.113.1', 1); c.wait(500); return c.get('FW1').fwlog.some(e => e.action === 'block' && e.zin === 'LAN'); } },
     { label: 'Après correction : PC1 joint de nouveau le FAI', run: c => c.ping('PC1', '203.0.113.1') },
+  ],
+});
+
+/* ============================================================= CCNA — TP 3 */
+SC.push({
+  id: 'ccna-depan-vlan', diff: 2, title: 'Dépannage : VLAN et trunk mal configurés', level: 'CCNA / BTS SIO SISR', duration: '45 min', cat: 'CCNA',
+  desc: 'PC1 et PC3 devraient être dans le même VLAN (10) mais ne se joignent pas : la configuration de départ contient deux erreurs classiques à identifier et corriger, sans schéma fourni au préalable.',
+  objectives: ['Méthode de dépannage : show vlan brief, show interfaces trunk, show interfaces switchport', 'Repérer un port affecté au mauvais VLAN', 'Repérer une liaison inter-switch laissée en mode access au lieu de trunk'],
+  steps: [
+    'Constat : PC1 (SW1) et PC3 (SW2) doivent être dans le VLAN 10 mais <code>ping</code> échoue entre eux.',
+    'Sur SW1 : <code>show vlan brief</code> — le port de PC1 est-il bien dans le VLAN 10 ? Sur SW2, idem pour PC3.',
+    'Sur SW1 et SW2 : <code>show interfaces trunk</code> — la liaison inter-switch (gi0/1) apparaît-elle dans la liste ? Si non, <code>show running-config interface gi0/1</code> pour voir son mode réel.',
+    'Corrigez les deux anomalies trouvées (VLAN du port, mode de la liaison inter-switch), puis revérifiez la connectivité.',
+    'Pour aller plus loin : que se serait-il passé si le VLAN natif avait été différent sur les deux extrémités du trunk (non simulé ici, mais à connaître : trames « double-taguées » mal interprétées, alerte CDP native VLAN mismatch) ?',
+  ],
+  build(sim) {
+    const { dev, link, get } = mk(sim);
+    dev('sw-2960', 'SW1', 250, 150); dev('sw-2960', 'SW2', 550, 150); dev('pc-win', 'PC1', 150, 350); dev('pc-win', 'PC2', 350, 350); dev('pc-win', 'PC3', 550, 350);
+    link('SW1', 'gi0/1', 'SW2', 'gi0/1'); link('PC1', 'eth0', 'SW1', 'fa0/1'); link('PC2', 'eth0', 'SW1', 'fa0/2'); link('PC3', 'eth0', 'SW2', 'fa0/1');
+    hostIp(get('PC1'), '192.168.10.11'); hostIp(get('PC2'), '192.168.20.12'); hostIp(get('PC3'), '192.168.10.13');
+    const base = 'enable\nconf t\nvlan 10\nname DONNEES\nvlan 20\nname AUTRE\nexit\n';
+    cliRun(get('SW1'), base + 'interface fa0/1\nswitchport mode access\nswitchport access vlan 20\nexit\ninterface fa0/2\nswitchport mode access\nswitchport access vlan 20\nexit\ninterface gi0/1\nswitchport mode access\nend');
+    cliRun(get('SW2'), base + 'interface fa0/1\nswitchport mode access\nswitchport access vlan 10\nexit\nend');
+  },
+  solve(sim) {
+    const { get } = mk(sim);
+    cliRun(get('SW1'), 'enable\nconf t\ninterface fa0/1\nswitchport access vlan 10\nexit\ninterface gi0/1\nswitchport mode trunk\nend');
+    cliRun(get('SW2'), 'enable\nconf t\ninterface gi0/1\nswitchport mode trunk\nend');
+  },
+  checks: [{ label: 'PC1 (VLAN 10) joint PC3 (VLAN 10) à travers le trunk', run: c => { c.wait(6000); return c.ping('PC1', '192.168.10.13'); } }, { label: 'La liaison inter-switch est bien un trunk', run: c => c.get('SW1').findPort('gi0/1').mode === 'trunk' && c.get('SW2').findPort('gi0/1').mode === 'trunk' }],
+});
+
+/* ============================================================= CCNA — TP 4 */
+SC.push({
+  id: 'ccna-acl', diff: 2, title: 'Listes de contrôle d\'accès étendues : filtrage de services', level: 'CCNA / BTS SIO SISR', duration: '1 h', cat: 'CCNA',
+  desc: 'Un routeur sépare deux réseaux (utilisateurs et serveurs). À l\'aide d\'une ACL nommée étendue, autorisez précisément le strict nécessaire (HTTP, DNS) et bloquez le reste (Telnet, ping), dans le bon ordre.',
+  objectives: ['Écrire une ACL étendue nommée avec plusieurs instructions ordonnées', 'Comprendre le refus implicite en fin de liste et l\'importance de l\'ordre des lignes', 'Appliquer l\'ACL dans le bon sens (in/out) sur la bonne interface et vérifier avec les compteurs'],
+  steps: [
+    'Topologie : LAN <code>192.168.1.0/24</code> (PC1, PC2) — R1 — LAN <code>192.168.2.0/24</code> (SRV, avec un service web et un serveur Telnet actif).',
+    'Exigence : PC1 et PC2 doivent pouvoir accéder au <b>web</b> (TCP 80) de SRV et le <b>pinguer</b>, mais pas s\'y connecter en <b>Telnet</b> (TCP 23).',
+    'Créez <code>ip access-list extended VERS_SRV</code> : une ligne <code>deny tcp any host &lt;IP SRV&gt; eq 23</code>, puis une ligne <code>permit ip any any</code> (l\'ordre est essentiel : le deny doit précéder le permit général).',
+    'Appliquez-la en entrée de l\'interface du LAN utilisateurs (<code>ip access-group VERS_SRV in</code>). Vérifiez avec <code>show access-lists</code> : les compteurs augmentent-ils sur la bonne ligne après un essai de chaque service ?',
+    'Testez : ping SRV (doit passer), <code>curl http://&lt;IP SRV&gt;</code> (doit passer), <code>telnet &lt;IP SRV&gt;</code> (doit être refusé).',
+  ],
+  build(sim) {
+    const { dev, link, get } = mk(sim);
+    dev('r-2911', 'R1', 400, 120); dev('sw-2960', 'SW1', 200, 260); dev('sw-2960', 'SW2', 600, 260); dev('pc-win', 'PC1', 100, 400); dev('pc-win', 'PC2', 300, 400); dev('srv-linux', 'SRV', 600, 400);
+    link('PC1', 'eth0', 'SW1', 'fa0/1'); link('PC2', 'eth0', 'SW1', 'fa0/2'); link('R1', 'gi0/0', 'SW1', 'fa0/24'); link('R1', 'gi0/1', 'SW2', 'fa0/24'); link('SRV', 'ens33', 'SW2', 'fa0/1');
+    cliRun(get('R1'), 'enable\nconf t\ninterface gi0/0\nip address 192.168.1.1 255.255.255.0\nno shutdown\ninterface gi0/1\nip address 192.168.2.1 255.255.255.0\nno shutdown\nend');
+    hostIp(get('PC1'), '192.168.1.11', '24', '192.168.1.1'); hostIp(get('PC2'), '192.168.1.12', '24', '192.168.1.1');
+    const s = get('SRV'); hostIp(s, '192.168.2.10', '24', '192.168.2.1'); s.httpd.start();
+    cliRun(get('R1'), 'enable\nconf t\nusername admin secret cisco\nline vty 0 4\nlogin local\ntransport input telnet\nend');
+  },
+  solve(sim) {
+    const { get } = mk(sim);
+    cliRun(get('R1'), 'enable\nconf t\nip access-list extended VERS_SRV\ndeny tcp any host 192.168.2.10 eq 23\npermit ip any any\nexit\ninterface gi0/0\nip access-group VERS_SRV in\nend');
+  },
+  checks: [
+    { label: 'PC1 pingue toujours SRV', run: c => c.ping('PC1', '192.168.2.10') },
+    { label: 'PC1 accède au web de SRV', run: c => { const r = c.http('PC1', 'http://192.168.2.10'); return !!r && r.status === 200; } },
+    { label: 'Telnet de PC1 vers SRV est bloqué', run: c => { let opened = false, done = false; NS.tools.openRemote(c.get('PC1'), IP.parse('192.168.2.10'), 'telnet', { onOpen: () => { opened = true; done = true; }, onText() { }, onClose() { done = true; }, onError() { done = true; } }); c.sim.runUntil(() => done, 6000); return !opened; } },
+  ],
+});
+
+/* ============================================================= CCNA — TP 5 */
+SC.push({
+  id: 'ccna-depan-etherchannel', diff: 1, title: 'Dépannage : agrégation de liens (EtherChannel) qui ne monte pas', level: 'CCNA / BTS SIO SISR', duration: '30 min', cat: 'CCNA',
+  desc: 'Deux switches sont reliés par deux câbles, mais l\'agrégation ne se forme pas : les modes LACP configurés de chaque côté sont incompatibles. Identifiez lequel et corrigez-le.',
+  objectives: ['Connaître les combinaisons de modes qui forment (ou non) un EtherChannel (LACP active/active, active/passive ; PAgP desirable/auto ; on/on)', 'Diagnostiquer avec show etherchannel summary', 'Corriger la configuration pour obtenir un agrégat fonctionnel'],
+  steps: [
+    'Sur SWA et SWB : <code>show etherchannel summary</code>. Le Port-channel1 existe-t-il ? Combien de ports membres sont réellement agrégés (lettre « P ») ?',
+    'Comparez le mode configuré de chaque côté : <code>show running-config interface range fa0/1-2</code> sur SWA et SWB.',
+    'Un des deux switches est configuré en <code>channel-group 1 mode on</code> (agrégation forcée, sans protocole) pendant que l\'autre est en <code>mode active</code> (LACP) : ces deux modes sont incompatibles et ne négocient pas.',
+    'Corrigez pour que les deux côtés utilisent LACP (<code>active</code> des deux côtés, ou <code>active</code>/<code>passive</code>), puis revérifiez <code>show etherchannel summary</code> et la connectivité.',
+  ],
+  build(sim) {
+    const { dev, link, get } = mk(sim);
+    dev('sw-2960', 'SWA', 250, 150); dev('sw-2960', 'SWB', 550, 150); dev('pc-win', 'PA', 150, 350); dev('pc-win', 'PB', 650, 350);
+    link('SWA', 'fa0/1', 'SWB', 'fa0/1'); link('SWA', 'fa0/2', 'SWB', 'fa0/2'); link('PA', 'eth0', 'SWA', 'fa0/10'); link('PB', 'eth0', 'SWB', 'fa0/10');
+    hostIp(get('PA'), '10.0.0.1'); hostIp(get('PB'), '10.0.0.2');
+    cliRun(get('SWA'), 'enable\nconf t\ninterface range fa0/1-2\nchannel-group 1 mode on\nexit\ninterface port-channel 1\nswitchport mode trunk\nend');
+    cliRun(get('SWB'), 'enable\nconf t\ninterface range fa0/1-2\nchannel-group 1 mode active\nexit\ninterface port-channel 1\nswitchport mode trunk\nend');
+  },
+  solve(sim) {
+    const { get } = mk(sim);
+    cliRun(get('SWA'), 'enable\nconf t\ninterface range fa0/1-2\nno channel-group 1\nchannel-group 1 mode active\nend');
+  },
+  checks: [{ label: 'Les 2 liens sont agrégés (Port-channel1) sur SWA', run: c => { const s = c.get('SWA'); return s.chans && s.chans.size && s.chans.get(1).bundled().length === 2; } }, { label: 'PA joint PB à travers l\'EtherChannel', run: c => c.ping('PA', '10.0.0.2') }],
+});
+
+/* ============================================================= Stormshield — TP 3 */
+SC.push({
+  id: 'ss-nat-multi', diff: 2, title: 'Translation d\'adresses : NAT statique et publication de plusieurs services', level: 'Habilitation Stormshield (CSNA) / BTS SIO', duration: '1 h', cat: 'Stormshield',
+  desc: 'Deux serveurs de la DMZ (web et messagerie) doivent être publiés vers Internet, chacun avec sa propre redirection de port, sans exposer l\'un à la place de l\'autre.',
+  objectives: ['Créer plusieurs redirections de port (NAT statique) vers des objets différents', 'Associer à chaque redirection la règle de filtrage correspondante (principe du moindre privilège, un service = une règle)', 'Vérifier qu\'aucun port non publié n\'est accessible depuis Internet'],
+  steps: [
+    'Deux serveurs en DMZ : <b>WEB</b> (<code>172.16.0.10</code>, port 80) et <b>MAIL</b> (<code>172.16.0.20</code>, port 25). Le pare-feu a une seule adresse publique (<code>203.0.113.2</code>).',
+    'Onglet <b>NAT / redirections</b> : ajoutez une redirection <code>TCP 80 → 172.16.0.10:80</code> et une seconde <code>TCP 25 → 172.16.0.20:25</code>.',
+    'Onglet <b>Règles</b> : ajoutez une règle <b>WAN → DMZ, TCP, port 80, Autoriser</b> (pour WEB) et une règle <b>WAN → DMZ, TCP, port 25, Autoriser</b> (pour MAIL) — une règle par service, pas de règle générique.',
+    'Depuis CLIENT (Internet) : <code>curl http://203.0.113.2</code> doit atteindre WEB. Vérifiez qu\'un port non publié (par ex. SSH, 22) reste bloqué sur les deux serveurs.',
+    'Journal : confirmez que les tentatives sur les ports non publiés sont bien journalisées en « block », motif « politique par défaut ».',
+  ],
+  build(sim) {
+    const { dev, link, get } = mk(sim);
+    dev('fw-sn210', 'FW1', 380, 200); dev('sw-8p', 'SWDMZ', 380, 340); dev('srv-linux', 'WEB', 250, 440); dev('srv-linux', 'MAIL', 500, 440); dev('inet', 'FAI', 620, 200); dev('pc-linux', 'CLIENT', 820, 200);
+    link('WEB', 'ens33', 'SWDMZ', 'port1'); link('MAIL', 'ens33', 'SWDMZ', 'port2'); link('SWDMZ', 'port8', 'FW1', 'dmz1'); link('FW1', 'out', 'FAI', 'gi0/0'); link('FAI', 'gi0/1', 'CLIENT', 'ens33');
+    cliRun(get('FAI'), 'enable\nconf t\ninterface gi0/0\nip address 203.0.113.1 255.255.255.252\nno shutdown\ninterface gi0/1\nip address 198.51.100.1 255.255.255.0\nno shutdown\nend');
+    hostIp(get('CLIENT'), '198.51.100.20', '24', '198.51.100.1');
+    const w = get('WEB'); hostIp(w, '172.16.0.10', '24', '172.16.0.254'); w.httpd.start();
+    hostIp(get('MAIL'), '172.16.0.20', '24', '172.16.0.254');
+    const f = get('FW1'); const o = f.ifaceByName('out'); f.enableDhcp(o, false); o.ip = IP.parse('203.0.113.2'); o.mask = IP.parseMask('30');
+    f.statics.push({ net: 0, mask: 0, nh: IP.parse('203.0.113.1'), iface: null, ad: 1 });
+  },
+  solve(sim) {
+    const { get } = mk(sim); const f = get('FW1');
+    f.forwards = [{ proto: 'tcp', port: 80, toIp: '172.16.0.10', toPort: 80 }, { proto: 'tcp', port: 25, toIp: '172.16.0.20', toPort: 25 }];
+    f.rules.push({ on: true, action: 'pass', from: 'WAN', to: 'DMZ', proto: 'tcp', src: 'any', dst: 'any', dport: '80', comment: 'Publication WEB' });
+    f.rules.push({ on: true, action: 'pass', from: 'WAN', to: 'DMZ', proto: 'tcp', src: 'any', dst: 'any', dport: '25', comment: 'Publication MAIL' });
+    f.rebuildNat();
+  },
+  checks: [
+    { label: 'CLIENT accède au site WEB publié', run: c => { const r = c.http('CLIENT', 'http://203.0.113.2'); return !!r && r.status === 200; } },
+    { label: 'WEB n\'est pas accessible en SSH depuis Internet (port non publié)', run: c => { let ok = false, done = false; c.get('CLIENT').tcpConnect(IP.parse('203.0.113.2'), 22, { onOpen: () => { ok = true; done = true; }, onError: () => done = true }); c.sim.runUntil(() => done, 4000); return !ok; } },
+  ],
+});
+
+/* ============================================================= Stormshield — TP 4 */
+SC.push({
+  id: 'ss-segmentation', diff: 3, title: 'Segmentation multi-zones : LAN utilisateurs, LAN d\'administration, DMZ', level: 'Habilitation Stormshield (CSNA) / BTS SIO', duration: '1 h', cat: 'Stormshield',
+  desc: 'Une troisième zone (interface DMZ2) héberge un poste d\'administration : lui seul doit pouvoir joindre le serveur de la DMZ sur un port de gestion ; le LAN utilisateurs ne doit avoir accès qu\'au service publié.',
+  objectives: ['Concevoir une politique multi-zones (plus de deux zones internes)', 'Appliquer le principe du moindre privilège entre zones (chaque zone n\'accède qu\'à ce dont elle a besoin)', 'Distinguer un accès de gestion (administration) d\'un accès de service (utilisateurs)'],
+  steps: [
+    'Le pare-feu a 4 zones : WAN (out), LAN utilisateurs (in), DMZ (dmz1, serveur SRV), et une zone d\'administration ADMIN (dmz2, poste ADMIN-PC).',
+    'Exigence : le LAN utilisateurs accède au serveur SRV uniquement en HTTP (80). Le poste ADMIN-PC accède à SRV en HTTP <b>et</b> en SSH (22, gestion). Le LAN utilisateurs ne doit <b>pas</b> pouvoir joindre la zone ADMIN.',
+    'Onglet <b>Règles</b> de FW1, dans l\'ordre : <code>LAN → DMZ, TCP 80, Autoriser</code> ; <code>ADMIN → DMZ, TCP any, Autoriser</code> ; puis rien d\'autre (le refus implicite fait le reste).',
+    'Vérifiez : PC1 (LAN) accède au web de SRV mais pas en SSH ; ADMIN-PC accède aux deux ; PC1 ne peut pas joindre ADMIN-PC (aucune règle LAN→ADMIN).',
+  ],
+  build(sim) {
+    const { dev, link, get } = mk(sim);
+    dev('fw-sn210', 'FW1', 400, 200); dev('sw-8p', 'SW1', 200, 200); dev('pc-win', 'PC1', 200, 380); dev('srv-linux', 'SRV', 400, 380); dev('pc-linux', 'ADMIN-PC', 600, 380);
+    link('SW1', 'port1', 'FW1', 'in'); link('PC1', 'eth0', 'SW1', 'port2'); link('SRV', 'ens33', 'FW1', 'dmz1'); link('ADMIN-PC', 'ens33', 'FW1', 'dmz2');
+    hostIp(get('PC1'), '192.168.1.10', '24', '192.168.1.254'); const s = get('SRV'); hostIp(s, '172.16.0.10', '24', '172.16.0.254'); s.httpd.start(); hostIp(get('ADMIN-PC'), '172.16.1.10', '24', '172.16.1.254');
+  },
+  solve(sim) {
+    const { get } = mk(sim); const f = get('FW1');
+    f.rules = [
+      { on: true, action: 'pass', from: 'LAN', to: 'DMZ', proto: 'tcp', src: 'any', dst: 'any', dport: '80', comment: 'LAN -> web SRV uniquement' },
+      { on: true, action: 'pass', from: 'DMZ2', to: 'DMZ', proto: 'any', src: 'any', dst: 'any', dport: 'any', comment: 'Administration -> SRV (tout)' },
+    ];
+  },
+  checks: [
+    { label: 'PC1 (LAN) accède au web de SRV', run: c => { const r = c.http('PC1', 'http://172.16.0.10'); return !!r && r.status === 200; } },
+    { label: 'PC1 (LAN) ne peut PAS se connecter en SSH à SRV', run: c => { let ok = false, done = false; c.get('PC1').tcpConnect(IP.parse('172.16.0.10'), 22, { onOpen: () => { ok = true; done = true; }, onError: () => done = true }); c.sim.runUntil(() => done, 4000); return !ok; } },
+    { label: 'ADMIN-PC accède à SRV en SSH', run: c => { let ok = false, done = false; c.get('ADMIN-PC').tcpConnect(IP.parse('172.16.0.10'), 22, { onOpen: () => { ok = true; done = true; }, onError: () => done = true }); c.sim.runUntil(() => done, 4000); return ok; } },
+    { label: 'PC1 (LAN) ne peut pas joindre ADMIN-PC (zones cloisonnées)', run: c => !c.ping('PC1', '172.16.1.10', 2) },
+  ],
+});
+
+/* ============================================================= Stormshield — TP 5 */
+SC.push({
+  id: 'ss-durcissement', diff: 1, title: 'Durcissement : exposition minimale depuis Internet', level: 'Habilitation Stormshield (CSNA) / BTS SIO', duration: '30 min', cat: 'Stormshield',
+  desc: 'La configuration de départ est dangereusement permissive (ping accepté depuis Internet, règle WAN→LAN ouverte) : identifiez les points d\'exposition dans le journal et corrigez-les.',
+  objectives: ['Repérer une exposition inutile depuis une interface WAN (ping, règle trop large)', 'Appliquer le principe du moindre privilège côté Internet', 'Confirmer la correction en relisant le journal de filtrage'],
+  steps: [
+    'Depuis <b>CLIENT</b> (Internet) : <code>ping 203.0.113.2</code> (adresse WAN du pare-feu) — répond-il ? C\'est anormal pour une interface exposée sur Internet.',
+    'Onglet <b>Règles</b> de FW1 : une règle <code>WAN → LAN, any, Autoriser</code> est présente — elle ne devrait jamais exister ainsi en production (elle annule toute la protection du LAN).',
+    'Corrigez : désactivez le ping depuis le WAN et supprimez la règle WAN→LAN trop permissive.',
+    'Revérifiez : le ping WAN doit maintenant être refusé, et CLIENT ne doit plus pouvoir joindre PC1 dans le LAN. Consultez le journal pour confirmer les blocages.',
+  ],
+  build(sim) {
+    const { dev, link, get } = mk(sim);
+    dev('fw-sn210', 'FW1', 380, 200); dev('sw-8p', 'SW1', 160, 200); dev('pc-win', 'PC1', 160, 380); dev('inet', 'FAI', 620, 200); dev('pc-linux', 'CLIENT', 820, 200);
+    link('SW1', 'port1', 'FW1', 'in'); link('PC1', 'eth0', 'SW1', 'port2'); link('FW1', 'out', 'FAI', 'gi0/0'); link('FAI', 'gi0/1', 'CLIENT', 'ens33');
+    cliRun(get('FAI'), 'enable\nconf t\ninterface gi0/0\nip address 203.0.113.1 255.255.255.252\nno shutdown\ninterface gi0/1\nip address 198.51.100.1 255.255.255.0\nno shutdown\nend');
+    hostIp(get('CLIENT'), '198.51.100.20', '24', '198.51.100.1'); hostIp(get('PC1'), '192.168.1.10', '24', '192.168.1.254');
+    const f = get('FW1'); const o = f.ifaceByName('out'); f.enableDhcp(o, false); o.ip = IP.parse('203.0.113.2'); o.mask = IP.parseMask('30');
+    f.statics.push({ net: 0, mask: 0, nh: IP.parse('203.0.113.1'), iface: null, ad: 1 });
+    f.wanPing = true; f.rules.unshift({ on: true, action: 'pass', from: 'WAN', to: 'LAN', proto: 'any', src: 'any', dst: 'any', dport: 'any', comment: 'À SUPPRIMER : bien trop permissif' });
+  },
+  solve(sim) {
+    const { get } = mk(sim); const f = get('FW1');
+    f.wanPing = false; f.rules = f.rules.filter(r => !(r.from === 'WAN' && r.to === 'LAN'));
+  },
+  checks: [
+    { label: 'Le ping depuis Internet vers l\'interface WAN du pare-feu est refusé', run: c => !c.ping('CLIENT', '203.0.113.2', 2) },
+    { label: 'CLIENT (Internet) ne peut plus joindre PC1 (LAN)', run: c => !c.ping('CLIENT', '192.168.1.10', 2) },
   ],
 });
 
