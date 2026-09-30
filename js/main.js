@@ -52,7 +52,20 @@ function loadData(d, quiet) {
 function closeAllDev() { ui.closeAllWindows(); sim.devices.forEach(d => { d._sess = null; d._termApi = null; d._termBanner = false; }); }
 function resetAll() { closeAllDev(); NS.clearTopology(sim); app.sel = null; app.tpCurrent = null; renderTp(); app.clearHalt(); app.refresh(); if (app.analyzer) { app.analyzer.clear(); app.analyzer.fillLinks(); } }
 $('#btn-new').addEventListener('click', () => { const go = () => { resetAll(); app.fit(); autosave(); }; if (sim.devices.size) ui.confirmBox('Nouveau plan', 'Effacer le plan actuel ? (le plan courant est déjà sauvegardé automatiquement dans ce navigateur, mais pas exporté)', go); else go(); });
-$('#btn-save').addEventListener('click', () => { const b = new Blob([JSON.stringify(snapshot(), null, 1)], { type: 'application/json' }); const a = h('a', { href: URL.createObjectURL(b), download: 'reseau.json' }); document.body.appendChild(a); a.click(); a.remove(); ui.toast('Plan enregistré (reseau.json)', 'ok'); });
+let saveHandle = null;
+async function saveAs(forcePicker) {
+  const data = JSON.stringify(snapshot(), null, 1);
+  if (window.showSaveFilePicker) {
+    try {
+      const handle = (!forcePicker && saveHandle) ? saveHandle : await window.showSaveFilePicker({ suggestedName: 'reseau.json', types: [{ description: 'Plan réseau (JSON)', accept: { 'application/json': ['.json'] } }] });
+      const w = await handle.createWritable(); await w.write(data); await w.close();
+      saveHandle = handle; ui.toast('Plan enregistré (' + handle.name + ')', 'ok'); return;
+    } catch (e) { if (e && e.name === 'AbortError') return; /* API indisponible ou refusée : repli ci-dessous */ }
+  }
+  const b = new Blob([data], { type: 'application/json' }); const a = h('a', { href: URL.createObjectURL(b), download: 'reseau.json' }); document.body.appendChild(a); a.click(); a.remove(); ui.toast('Plan enregistré (reseau.json)', 'ok');
+}
+$('#btn-save').addEventListener('click', () => saveAs(false));
+$('#btn-save').addEventListener('contextmenu', e => { e.preventDefault(); saveAs(true); });
 $('#btn-open').addEventListener('click', () => $('#filein').click());
 $('#filein').addEventListener('change', e => { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { try { loadData(JSON.parse(r.result)); } catch (x) { ui.toast('Fichier illisible', 'err'); } }; r.readAsText(f); e.target.value = ''; });
 setInterval(() => { if (sim.devices.size) autosave(); }, 5000); window.addEventListener('beforeunload', autosave);
