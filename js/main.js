@@ -77,6 +77,12 @@ function renderTp() {
   if (!sc) { box.appendChild(h('div', h('h3', 'Aucun TP chargé'), h('p.muted', 'Utilisez « TP d\'exemple » en haut de l\'écran pour charger un sujet avec sa topologie de départ, ses étapes, une correction et des vérifications automatiques.'))); return; }
   const res = h('div.tpres');
   box.appendChild(h('div.tp', h('h3', sc.title), h('span.lvl', sc.level + ' · ' + sc.duration + ' · ' + diffText(sc.diff)), h('p', sc.desc),
+    (sc.cat === 'Cybersécurité' ? h('div.legal', h('b', '⚠ Cadre légal — à lire avant de commencer. '),
+      'Les techniques présentées dans ce TP (scan, usurpation ARP, saturation de commutateur, serveur DHCP non autorisé…) ne s\'exécutent ici que sur des équipements simulés, isolés de tout réseau réel. ',
+      'En France, accéder ou se maintenir sans autorisation dans un système informatique, l\'entraver ou y introduire, modifier ou supprimer des données sont des délits pénaux (articles ',
+      h('a', { href: 'https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT6000000707722/LEGISCTA000006165314/', target: '_blank', rel: 'noopener' }, '323-1 à 323-3-1 du code pénal'),
+      ', jusqu\'à 5 ans d\'emprisonnement et 150 000 € d\'amende, davantage sur un système d\'un opérateur d\'importance vitale). ',
+      'Reproduire ces manipulations sur un réseau, un poste ou un service que vous ne possédez pas et pour lequel vous n\'avez pas d\'autorisation écrite est strictement interdit, y compris « pour tester » ou « par curiosité ». Ce TP reste un support pédagogique de compréhension et de défense, pas un mode d\'emploi.') : null),
     h('h4', 'Objectifs'), h('ul', sc.objectives.map(o => h('li', o))), h('h4', 'Déroulé'), h('ol', sc.steps.map(s => h('li', { html: s }))),
     h('div.btns', h('button.primary', { onclick: () => { res.textContent = 'Vérification en cours…'; setTimeout(() => runChecks(sc, res), 20); } }, '✔ Vérifier mon travail'), sc.solve ? h('button', { onclick: () => ui.confirmBox('Correction', 'Appliquer la configuration corrigée ? Votre travail sera écrasé.', () => { sc.solve(sim); app.refresh(); ui.toast('Correction appliquée', 'ok'); }) }, 'Charger la correction') : h('span.muted.small', 'Pas de correction automatique : ce TP est un TP d\'observation.'), h('button', { onclick: () => startScenarioNow(sc) }, 'Recommencer')), res));
 }
