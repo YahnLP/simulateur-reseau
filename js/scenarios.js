@@ -935,19 +935,20 @@ SC.push({
 /* ============================================================= Stormshield — TP 4 */
 SC.push({
   id: 'ss-segmentation', diff: 3, title: 'Segmentation multi-zones : LAN utilisateurs, LAN d\'administration, DMZ', level: 'Habilitation Stormshield (CSNA) / BTS SIO', duration: '1 h', cat: 'Stormshield',
-  desc: 'Une troisième zone (interface DMZ2) héberge un poste d\'administration : lui seul doit pouvoir joindre le serveur de la DMZ sur un port de gestion ; le LAN utilisateurs ne doit avoir accès qu\'au service publié.',
+  desc: 'Une troisième zone (interface DMZ2) héberge un poste d\'administration : lui seul doit pouvoir joindre le serveur de la DMZ sur un port de gestion (HTTPS) ; le LAN utilisateurs ne doit avoir accès qu\'au service publié (HTTP).',
   objectives: ['Concevoir une politique multi-zones (plus de deux zones internes)', 'Appliquer le principe du moindre privilège entre zones (chaque zone n\'accède qu\'à ce dont elle a besoin)', 'Distinguer un accès de gestion (administration) d\'un accès de service (utilisateurs)'],
   steps: [
     'Le pare-feu a 4 zones : WAN (out), LAN utilisateurs (in), DMZ (dmz1, serveur SRV), et une zone d\'administration ADMIN (dmz2, poste ADMIN-PC).',
-    'Exigence : le LAN utilisateurs accède au serveur SRV uniquement en HTTP (80). Le poste ADMIN-PC accède à SRV en HTTP <b>et</b> en SSH (22, gestion). Le LAN utilisateurs ne doit <b>pas</b> pouvoir joindre la zone ADMIN.',
+    'Exigence : le LAN utilisateurs accède au serveur SRV uniquement en HTTP (80). Le poste ADMIN-PC accède à SRV en HTTP <b>et</b> en HTTPS (443, interface de gestion). Le LAN utilisateurs ne doit <b>pas</b> pouvoir joindre la zone ADMIN.',
     'Onglet <b>Règles</b> de FW1, dans l\'ordre : <code>LAN → DMZ, TCP 80, Autoriser</code> ; <code>ADMIN → DMZ, TCP any, Autoriser</code> ; puis rien d\'autre (le refus implicite fait le reste).',
-    'Vérifiez : PC1 (LAN) accède au web de SRV mais pas en SSH ; ADMIN-PC accède aux deux ; PC1 ne peut pas joindre ADMIN-PC (aucune règle LAN→ADMIN).',
+    'Vérifiez : PC1 (LAN) accède au web de SRV mais pas à l\'interface de gestion HTTPS ; ADMIN-PC accède aux deux ; PC1 ne peut pas joindre ADMIN-PC (aucune règle LAN→ADMIN).',
   ],
   build(sim) {
     const { dev, link, get } = mk(sim);
     dev('fw-sn210', 'FW1', 400, 200); dev('sw-8p', 'SW1', 200, 200); dev('pc-win', 'PC1', 200, 380); dev('srv-linux', 'SRV', 400, 380); dev('pc-linux', 'ADMIN-PC', 600, 380);
     link('SW1', 'port1', 'FW1', 'in'); link('PC1', 'eth0', 'SW1', 'port2'); link('SRV', 'ens33', 'FW1', 'dmz1'); link('ADMIN-PC', 'ens33', 'FW1', 'dmz2');
-    hostIp(get('PC1'), '192.168.1.10', '24', '192.168.1.254'); const s = get('SRV'); hostIp(s, '172.16.0.10', '24', '172.16.0.254'); s.httpd.start(); hostIp(get('ADMIN-PC'), '172.16.1.10', '24', '172.16.1.254');
+    hostIp(get('PC1'), '192.168.1.10', '24', '192.168.1.254'); const s = get('SRV'); hostIp(s, '172.16.0.10', '24', '172.16.0.254'); s.httpd.https = true; s.httpd.start(); hostIp(get('ADMIN-PC'), '172.16.1.10', '24', '172.16.1.254');
+    const fw2 = get('FW1').ifaceByName('dmz2'); fw2.ip = IP.parse('172.16.1.254'); fw2.mask = IP.parseMask('24');
   },
   solve(sim) {
     const { get } = mk(sim); const f = get('FW1');
@@ -958,8 +959,8 @@ SC.push({
   },
   checks: [
     { label: 'PC1 (LAN) accède au web de SRV', run: c => { const r = c.http('PC1', 'http://172.16.0.10'); return !!r && r.status === 200; } },
-    { label: 'PC1 (LAN) ne peut PAS se connecter en SSH à SRV', run: c => { let ok = false, done = false; c.get('PC1').tcpConnect(IP.parse('172.16.0.10'), 22, { onOpen: () => { ok = true; done = true; }, onError: () => done = true }); c.sim.runUntil(() => done, 4000); return !ok; } },
-    { label: 'ADMIN-PC accède à SRV en SSH', run: c => { let ok = false, done = false; c.get('ADMIN-PC').tcpConnect(IP.parse('172.16.0.10'), 22, { onOpen: () => { ok = true; done = true; }, onError: () => done = true }); c.sim.runUntil(() => done, 4000); return ok; } },
+    { label: 'PC1 (LAN) ne peut PAS joindre l\'interface de gestion HTTPS de SRV', run: c => { let ok = false, done = false; c.get('PC1').tcpConnect(IP.parse('172.16.0.10'), 443, { onOpen: () => { ok = true; done = true; }, onError: () => done = true }); c.sim.runUntil(() => done, 4000); return !ok; } },
+    { label: 'ADMIN-PC accède à l\'interface de gestion HTTPS de SRV', run: c => { let ok = false, done = false; c.get('ADMIN-PC').tcpConnect(IP.parse('172.16.0.10'), 443, { onOpen: () => { ok = true; done = true; }, onError: () => done = true }); c.sim.runUntil(() => done, 4000); return ok; } },
     { label: 'PC1 (LAN) ne peut pas joindre ADMIN-PC (zones cloisonnées)', run: c => !c.ping('PC1', '172.16.1.10', 2) },
   ],
 });
