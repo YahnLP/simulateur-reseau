@@ -1,0 +1,12 @@
+const NS=require('./load')(); const {Codec,IP}=NS; let bad=0; const t=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m); if(!c)bad++;};
+const sdp=Codec.sdp({user:'1001',sid:1,ip:IP.parse('10.0.0.9'),port:10000,pts:[0,8,101]});
+const sip=Codec.sip({method:'INVITE',uri:'sip:1002@10.0.0.5',headers:[['Via','SIP/2.0/UDP 10.0.0.9:5060;branch=z9hG4bKabc'],['From','<sip:1001@10.0.0.5>;tag=aa'],['To','<sip:1002@10.0.0.5>'],['Call-ID','x1@10.0.0.9'],['CSeq','1 INVITE'],['Content-Type','application/sdp']],body:sdp});
+const A=IP.parse('10.0.0.9'),B=IP.parse('10.0.0.5'); const M='00:11:22:33:44:55';
+const fr=(l4,src,dst)=>Codec.frame({dst:M,src:'00:aa:bb:cc:dd:ee',type:0x0800,payload:Codec.ipPacket({ttl:64,proto:17,src,dst,tos:0xb8},l4)});
+let p=Codec.parse(fr(Codec.udp(A,B,5060,5060,sip),A,B),true);
+t(p.sip&&p.sip.method==='INVITE'&&p.sip.sdp&&p.sip.sdp.port===10000&&p.sip.from==='1001'&&p.sip.to==='1002','sip invite parse'); t(p.tree.some(n=>n.layer==='sip'),'sip arbre');
+const r=Codec.rtp({pt:0,seq:5,ts:800,ssrc:0xabcdef01,payload:new Uint8Array(160)});
+p=Codec.parse(fr(Codec.udp(A,B,10000,10002,r),A,B),true); t(p.rtp&&p.rtp.pt===0&&p.rtp.seq===5&&p.rtp.len===160&&p.ip.tos===0xb8,'rtp parse');
+const cd=Codec.cdp({device:'SW1',port:'FastEthernet0/1',platform:'cisco WS-C2960',voiceVlan:20});
+const f=Codec.frameSnap({dst:Codec.CDP_MAC,src:'00:aa:bb:cc:dd:ee',oui:[0,0,12],pid:0x2000,payload:cd}); p=Codec.parse(f,true); t(p.cdp&&p.cdp.voiceVlan===20&&p.cdp.device==='SW1','cdp parse');
+process.exit(bad?1:0);

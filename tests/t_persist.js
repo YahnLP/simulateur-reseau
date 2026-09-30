@@ -1,0 +1,16 @@
+const {NS,Sim,createDevice,IP,cli}=require('./helpers'); let bad=0; const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m); if(!c) bad++;};
+const sim=new Sim(); const S=createDevice(sim,'srv-linux',{name:'S'}), P=createDevice(sim,'pc-win',{name:'P'});
+S.mgmt.setCommunity('lab','rw'); S.mgmt.snmp.location='Salle A'; S.mgmt.startSyslogd();
+S.ip6.enable(S.mainIface); S.ip6.addAddr(S.mainIface,NS.IP6.parse('2001:db8::5'),64,'manual');
+S.radius.addClient(IP.parse('10.0.0.1'),0xFFFFFFFF,'K','sw'); S.radius.addUser('bob','pw',{vlan:20}); S.radius.startSrv();
+P.dot1x.supSet({user:'bob',pass:'pw',method:'md5'});
+const j=JSON.parse(JSON.stringify(S.serialize())), jp=JSON.parse(JSON.stringify(P.serialize()));
+const sim2=new Sim(); const S2=createDevice(sim2,'srv-linux',{name:'S'}), P2=createDevice(sim2,'pc-win',{name:'P'}); S2.restore(j); P2.restore(jp);
+ok(S2.mgmt.snmp.comms.get('lab')==='rw'&&S2.mgmt.snmp.location==='Salle A'&&S2.mgmt.syslogd.enabled,'snmp/syslog restaurés');
+ok(S2.mainIface.v6&&S2.mainIface.v6.addrs.some(a=>a.addr===NS.IP6.parse('2001:db8::5')),'IPv6 restauré');
+ok(S2.radius.srv.enabled&&S2.radius.srv.users.get('bob').vlan===20&&S2.radius.srv.clients.length===1,'RADIUS restauré');
+ok(P2.dot1x.sup.user==='bob'&&P2.dot1x.sup.method==='md5','supplicant restauré');
+S.pbx.addPeer('1001','p',{callerid:'A'}); S.pbx.addRoute('_1XXX','SIP/${EXTEN}'); S.pbx.start(); P.voip.configure({ext:'1001',secret:'p',server:'10.0.0.5',codecs:['G729','PCMU']});
+const j2=JSON.parse(JSON.stringify(S.serialize())), jp2=JSON.parse(JSON.stringify(P.serialize())); const sim3=new Sim(); const S3=createDevice(sim3,'srv-linux',{name:'S'}), P3=createDevice(sim3,'pc-win',{name:'P'}); S3.restore(j2); P3.restore(jp2);
+ok(S3.pbx.enabled&&S3.pbx.peers.get('1001').secret==='p'&&S3.pbx.routes.length===1,'PBX restaurée'); ok(P3.voip.cfg.ext==='1001'&&P3.voip.cfg.codecs[0]==='G729'&&P3.voip.cfg.server===NS.IP.parse('10.0.0.5'),'softphone restauré');
+process.exit(bad?1:0);

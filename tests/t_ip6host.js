@@ -1,0 +1,24 @@
+const {NS,Sim,createDevice,IP,cli}=require('./helpers'); const {IP6}=NS;
+let bad=0; const ok=(c,m)=>{ console.log((c?'PASS ':'FAIL ')+m); if(!c) bad++; };
+const sim=new Sim(); const R=createDevice(sim,'r-2911',{name:'R1'}), S=createDevice(sim,'sw-2960',{name:'S1'}), L=createDevice(sim,'pc-linux',{name:'LX'}), W=createDevice(sim,'pc-win',{name:'WIN'}), L2=createDevice(sim,'pc-linux',{name:'LX2'});
+sim.connect(L.ports[0],S.findPort('fa0/1')); sim.connect(W.ports[0],S.findPort('fa0/2')); sim.connect(R.findPort('gi0/0'),S.findPort('fa0/3')); sim.connect(L2.ports[0],S.findPort('fa0/4'));
+cli(sim,R,['enable','conf t','ipv6 unicast-routing','interface gi0/0','ipv6 address 2001:db8:1::1/64','no shutdown','end']); sim.runFor(4000);
+const run=(h,l)=>{ const sh=h.__sh||(h.__sh=h.newSession()); let out='',dn=false; sh.exec(l,{print:t=>out+=t,done:()=>dn=true}); sim.runUntil(()=>dn,60000); return out; };
+let o=run(L,'ip -6 a'); console.log(o); ok(/inet6 2001:db8:1:0:[0-9a-f:]+\/64 scope global dynamic/.test(o)&&/inet6 fe80::/.test(o),'Linux ip -6 a : SLAAC + LL');
+o=run(L,'ip -6 route'); console.log(o); ok(/default via fe80::/.test(o)&&/proto ra/.test(o),'ip -6 route : défaut via RA');
+o=run(L,'ping -6 -c 2 2001:db8:1::1'); console.log(o); ok(/2 received/.test(o),'ping -6 vers le routeur');
+o=run(L,'ping6 -c 1 fe80::1'); ok(/Network is unreachable|received/.test(o),'ping6 LL sans zone géré');
+const wa=W.mainIface.v6.addrs.find(a=>a.kind==='slaac'); 
+o=run(W,'ipconfig'); console.log(o); ok(/Adresse IPv6 [. ]+: 2001:db8:1:/.test(o)&&/liaison locale/.test(o)&&/Passerelle par défaut[. ]+: fe80::/.test(o),'Windows ipconfig IPv6');
+o=run(W,'ping -6 -n 2 '+IP6.str(L.mainIface.v6.addrs.find(a=>a.kind==='slaac').addr)); console.log(o); ok(/perdus = 0/.test(o),'Windows ping -6 vers Linux');
+o=run(W,'tracert -6 2001:db8:1::1'); console.log(o); ok(/Itinéraire déterminé/.test(o),'tracert -6');
+run(L2,'ip -6 addr add 2001:db8:1::99/64 dev ens33'); run(L2,'ip -6 route add default via 2001:db8:1::1'); sim.runFor(2500);
+o=run(L2,'ip -6 a'); ok(/2001:db8:1::99\/64 scope global/.test(o),'ip -6 addr add (statique)');
+o=run(L2,'ping -c 1 2001:db8:1::1'); ok(/1 received/.test(o),'ping routeur depuis statique');
+o=run(W,'netsh interface ipv6 add address "Ethernet0" 2001:db8:1::50/64'); sim.runFor(2000); o=run(W,'netsh interface ipv6 show addresses'); console.log(o); ok(/Manuel[ ]+Préféré[ ]+infinite[ ]+infinite[ ]+2001:db8:1::50/.test(o),'netsh add address');
+o=run(W,'netsh interface ipv6 show neighbors'); console.log(o.slice(0,400));
+o=run(W,'route print -6'); console.log(o.slice(-700));
+o=run(L2,'ip -6 neigh'); console.log(o); ok(/router/.test(o),'ip -6 neigh');
+// DAD duplicate depuis un hôte
+run(L2,'ip -6 addr add 2001:db8:1::50/64 dev ens33'); sim.runFor(2500); o=run(L2,'ip -6 a'); console.log(o.split('\n').filter(l=>/::50/.test(l)).join('\n')||'(adresse dupliquée non listée : OK)'); ok(!/2001:db8:1::50\/64/.test(o),'DAD : doublon exclu');
+console.log('bad',bad); process.exit(bad?1:0);

@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulateur Réseau — Bac Pro CIEL / BTS SIO SISR</title>
+<meta name="author" content="Yahn LE PRETTRE - Formaxion Landes">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header id="top">
+  <div class="brand"><span class="logo" aria-hidden="true">⬡</span> Simulateur Réseau <small>Bac Pro CIEL · BTS SIO SISR</small><span class="credit">Créé par Yahn LE PRETTRE - Formaxion Landes</span></div>
+  <div class="grp" role="group" aria-label="Fichier">
+    <button id="btn-new" title="Nouveau plan">Nouveau</button>
+    <button id="btn-open" title="Ouvrir un fichier .json">Ouvrir</button>
+    <button id="btn-save" title="Enregistrer le plan (.json)">Enregistrer</button>
+    <button id="btn-scen" class="accent" title="Charger un TP d'exemple">TP d'exemple ▾</button>
+  </div>
+  <div class="grp sim" role="group" aria-label="Simulation">
+    <button id="btn-run" title="Pause / lecture (Espace)">⏸ Pause</button>
+    <button id="btn-step" title="Avancer jusqu'à la prochaine trame reçue (en pause)">⏭ Trame</button>
+    <label class="spd" title="Vitesse de la simulation">Vitesse <input id="speed" type="range" min="0" max="100" value="50" aria-label="Vitesse"><output id="speedv">×4</output></label>
+    <button id="btn-t1" title="Avancer le temps simulé d'une minute (expiration ARP/MAC, baux…)">+1 min</button>
+    <span id="simtime" class="mono" aria-live="off">t = 0.000 s</span>
+  </div>
+  <div class="grp opts" role="group" aria-label="Options">
+    <label title="Si coché, un câble droit/croisé inadapté empêche le lien de monter (sinon Auto-MDIX)"><input type="checkbox" id="opt-strict"> Câbles stricts</label>
+    <label title="Accélère la convergence STP (2 s au lieu de 15 s)"><input type="checkbox" id="opt-stp" checked> STP rapide</label>
+    <label title="Afficher les noms de ports sur les liens"><input type="checkbox" id="opt-ports" checked> Ports</label>
+    <button id="btn-fit" title="Recentrer la vue">⌖</button>
+    <button id="btn-help" title="Aide et couverture du programme">? Aide</button>
+  </div>
+</header>
+
+<div id="main">
+  <aside id="left" aria-label="Équipements">
+    <div id="tools" role="toolbar" aria-label="Outils">
+      <button class="tool on" data-tool="select" title="Sélection / déplacement (V)">🖱 Sélection</button>
+      <button class="tool" data-tool="cable" title="Câbler (C)">🔌 Câble</button>
+      <button class="tool" data-tool="delete" title="Supprimer (X)">🗑 Supprimer</button>
+      <select id="cabtype" aria-label="Type de câble" style="display:none"></select>
+    </div>
+    <div id="palette"></div>
+  </aside>
+
+  <section id="center">
+    <div id="stage">
+      <svg id="canvas" xmlns="http://www.w3.org/2000/svg" role="application" aria-label="Plan du réseau" data-tool="select">
+        <g id="grid"></g>
+        <g id="world"><g id="links"></g><g id="fx"></g><g id="nodes"></g><g id="rubber"></g></g>
+      </svg>
+      <div id="toolhint" class="hint"></div>
+      <div id="haltbar" style="display:none" role="alert"><span id="haltmsg"></span> <button id="halt-ok">Réinitialiser la simulation</button></div>
+      <div id="legend" class="legend" aria-hidden="true"><span><i style="background:#eab308"></i>ARP</span><span><i style="background:#ec4899"></i>ICMP</span><span><i style="background:#7c3aed"></i>TCP</span><span><i style="background:#0ea5e9"></i>UDP</span><span><i style="background:#2563eb"></i>STP/LLC</span></div>
+    </div>
+    <div id="dock">
+      <div id="dockgrip" title="Redimensionner"></div>
+      <div id="docktabs" role="tablist"><button class="dtab on" data-dock="analyzer" role="tab">Analyseur de trames</button><button class="dtab" data-dock="log" role="tab">Journal</button><button id="dockmax" title="Agrandir / restaurer le panneau">⤢</button><button id="dockmin" title="Réduire / afficher">▾</button></div>
+      <div id="dockbody"><div id="pane-analyzer" class="pane"></div><div id="pane-log" class="pane" style="display:none"></div></div>
+    </div>
+  </section>
+
+  <aside id="right" aria-label="Propriétés">
+    <div id="rtabs" role="tablist"><button class="rtab on" data-r="insp" role="tab">Propriétés</button><button class="rtab" data-r="tp" role="tab">Sujet de TP</button></div>
+    <div id="inspector" class="rpane"></div>
+    <div id="tppane" class="rpane" style="display:none"></div>
+  </aside>
+</div>
+<div id="winlayer"></div>
+<input type="file" id="filein" accept=".json,application/json" style="display:none">
+
+<script src="js/util.js"></script>
+<script src="js/catalog.js"></script>
+<script src="js/codec.js"></script>
+<script src="js/codec_mgmt.js"></script>
+<script src="js/codec_ip6.js"></script>
+<script src="js/codec_vpn.js"></script>
+<script src="js/codec_aaa.js"></script>
+<script src="js/codec_voip.js"></script>
+<script src="js/sim.js"></script>
+<script src="js/qos.js"></script>
+<script src="js/stack.js"></script>
+<script src="js/services.js"></script>
+<script src="js/tools.js"></script>
+<script src="js/mgmt.js"></script>
+<script src="js/ip6.js"></script>
+<script src="js/vpn.js"></script>
+<script src="js/radius.js"></script>
+<script src="js/voip.js"></script>
+<script src="js/dot1x.js"></script>
+<script src="js/stp.js"></script>
+<script src="js/lag.js"></script>
+<script src="js/ospf.js"></script>
+<script src="js/devices.js"></script>
+<script src="js/ioscli.js"></script>
+<script src="js/ioscli_l2.js"></script>
+<script src="js/ioscli_l3.js"></script>
+<script src="js/ioscli_mgmt.js"></script>
+<script src="js/ioscli_ip6.js"></script>
+<script src="js/ioscli_vpn.js"></script>
+<script src="js/ioscli_aaa.js"></script>
+<script src="js/aos.js"></script>
+<script src="js/ioscli_qos.js"></script>
+<script src="js/host_persist.js"></script>
+<script src="js/hostshell.js"></script>
+<script src="js/hostshell_mgmt.js"></script>
+<script src="js/hostshell_ip6.js"></script>
+<script src="js/hostshell_aaa.js"></script>
+<script src="js/hostshell_voip.js"></script>
+<script src="js/cyber.js"></script>
+<script src="js/analyzer.js"></script>
+<script src="js/topology.js"></script>
+<script src="js/ui-core.js"></script>
+<script src="js/term.js"></script>
+<script src="js/devwin.js"></script>
+<script src="js/devwin_ext.js"></script>
+<script src="js/wireshark.js"></script>
+<script src="js/app.js"></script>
+<script src="js/scenarios.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

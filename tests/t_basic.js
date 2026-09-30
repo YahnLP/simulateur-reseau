@@ -1,0 +1,20 @@
+const NS=require('./load')();
+const {Sim,createDevice,IP,tools}=NS;
+const sim=new Sim();
+const pc1=createDevice(sim,'pc-win',{name:'PC1'}), pc2=createDevice(sim,'pc-linux',{name:'PC2'});
+const sw=createDevice(sim,'sw-2960',{name:'SW1'}); const r=createDevice(sim,'r-1941',{name:'R1'});
+const pc3=createDevice(sim,'pc-win',{name:'PC3'});
+sim.connect(pc1.ports[0],sw.findPort('fa0/1')); sim.connect(pc2.ports[0],sw.findPort('fa0/2')); sim.connect(r.findPort('gi0/0'),sw.findPort('fa0/3'));
+sim.connect(r.findPort('gi0/1'),pc3.ports[0]);
+pc1.applyIp('Ethernet0',{ip:'192.168.1.10',mask:'255.255.255.0'}); pc1.setGateway('192.168.1.1');
+pc2.applyIp('ens33',{ip:'192.168.1.11',mask:'24'}); pc2.setGateway('192.168.1.1');
+pc3.applyIp('Ethernet0',{ip:'10.0.0.2',mask:'255.255.255.0'}); pc3.setGateway('10.0.0.1');
+let i0=r.ifaceByName('gi0/0'); i0.ip=IP.parse('192.168.1.1'); i0.mask=IP.parseMask('24'); i0.adminUp=true;
+let i1=r.ifaceByName('gi0/1'); i1.ip=IP.parse('10.0.0.1'); i1.mask=IP.parseMask('24'); i1.adminUp=true;
+sim.runFor(10000);
+function ping(n,dst){ let out=[]; let done=false; tools.pingSeries(n,IP.parse(dst),{count:2},(r,i)=>out.push(r.type+(r.rtt!==undefined?':'+r.rtt.toFixed(2):'')),s=>{done=true;}); sim.runUntil(()=>done,20000); return out.join(' '); }
+console.log('PC1->PC2', ping(pc1,'192.168.1.11'));
+console.log('PC1->PC3', ping(pc1,'10.0.0.2'));
+console.log('PC1->none', ping(pc1,'192.168.1.99'));
+console.log('sw mac', Array.from(sw.macTable.keys()).join(','));
+console.log('stp', sw.ports.slice(0,3).map(p=>p.stp.state).join(','), 'frames', sim.stats.frames, 'caps', sim.captures.length);

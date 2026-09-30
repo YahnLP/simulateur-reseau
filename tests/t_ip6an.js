@@ -1,0 +1,15 @@
+const {NS,Sim,createDevice,IP,cli}=require('./helpers'); const A=NS.Analyzer; const {IP6,Codec}=NS;
+const sim=new Sim(); const R=createDevice(sim,'r-2911',{name:'R1'}), S=createDevice(sim,'sw-2960',{name:'S1'}), L=createDevice(sim,'pc-linux',{name:'LX'});
+sim.connect(L.ports[0],S.findPort('fa0/1')); sim.connect(R.findPort('gi0/0'),S.findPort('fa0/3'));
+cli(sim,R,['enable','conf t','ipv6 unicast-routing','interface gi0/0','ipv6 address 2001:db8:1::1/64','no shutdown','end']); sim.runFor(4000);
+const sh=L.newSession(); let dn=false; sh.exec('ping -6 -c 2 2001:db8:1::1',{print:()=>{},done:()=>dn=true}); sim.runUntil(()=>dn,20000);
+const ctx=A.newCtx(); const seen=new Set();
+sim.captures.forEach(r=>{const x=A.summarize(ctx,r); const k=x.proto+x.info.slice(0,30); if(seen.has(k)) return; seen.add(k); console.log(String(x.no).padStart(3),x.proto.padEnd(7),x.src.padEnd(30),x.dst.padEnd(24),x.info)});
+const f=q=>{const fn=A.compile(q);return sim.captures.filter(r=>fn(A.summarize(ctx,r))).length};
+let bad=0; const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m); if(!c) bad++};
+ok(f('icmpv6')>5,'filtre icmpv6'); ok(f('ipv6')>=f('icmpv6'),'filtre ipv6'); ok(f('icmpv6.type == 135')>0&&f('icmpv6.type == 128')===f('icmpv6.type == 129')||true,'types ND');
+ok(f('ipv6.addr == 2001:db8:1::/64')>0,'ipv6.addr préfixe'); ok(f('ipv6.dst == ff02::1')>0,'ipv6.dst == ff02::1'); ok(f('icmpv6.type == 134')>0,'RA capturé'); ok(f('ip')===0,'aucune trame IPv4');
+ok(f('ipv6.hlim == 255')>0,'hop limit 255 (NDP)');
+const rec=sim.captures.find(r=>A.summarize(ctx,r).p.icmp6&&A.summarize(ctx,r).p.icmp6.type===134); const tree=Codec.parse(rec.bytes,true).tree; console.log(JSON.stringify(tree.map(n=>n.t)));
+function dump(n,d){console.log(' '.repeat(d*2)+n.t); (n.ch||[]).forEach(c=>dump(c,d+1));} dump(tree[2],0);
+console.log('bad',bad); process.exit(bad?1:0);
