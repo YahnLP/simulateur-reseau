@@ -1,4 +1,5 @@
 /* hostshell_ip6.js — IPv6 côté postes : ip -6, ping -6/ping6, traceroute6, ipconfig, netsh interface ipv6 */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};

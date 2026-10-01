@@ -1,4 +1,5 @@
 /* ioscli_l2.js — commandes IOS : Spanning Tree (PVST+/Rapid-PVST+, guards) et EtherChannel (LACP/PAgP) */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};

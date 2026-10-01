@@ -1,5 +1,6 @@
 /* ioscli.js — interpréteur de commandes de type Cisco IOS pour routeurs et commutateurs
    (modes user/priv/config/interface/line/router/dhcp/acl/vlan, abréviations, ?, show, write, telnet/ssh serveur) */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};

@@ -1,5 +1,6 @@
 /* qos.js — moteur QoS : classification (DSCP/CoS/ACL/protocole), marquage, policer, file prioritaire (LLQ), débit limité (shape),
    confiance CoS/DSCP des switchs (mls qos). S'appuie sur des crochets de Sim.transmit : port.qos (émission) et port.qosIn (réception). */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {}; const { Codec } = NS;

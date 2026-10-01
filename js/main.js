@@ -1,4 +1,5 @@
 /* main.js — démarrage : barre d'outils, dock (analyseur/journal), fichiers, TP, aide */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function () {
 'use strict';
 const NS = window.NS; const { h, $, $$, clear, ui } = NS;
@@ -140,6 +141,21 @@ function helpModal(first) {
       h('p.small', 'Références : ', cov.sources.map(s => h('span', h('a', { href: s[1], target: '_blank', rel: 'noopener' }, s[0]), ' · ')))) },
     { id: 'prod', label: 'Produits et fiches', render: () => h('div', h('p.muted', '✔ = caractéristiques relevées sur la fiche constructeur (source indiquée). ≈ = valeurs typiques ou indicatives : à vérifier sur la fiche du produit réel.'),
       h('table.cov', h('tr', h('th', 'Équipement'), h('th', 'Catégorie'), h('th', 'Fiche'), h('th', 'Source')), NS.CAT_ORDER.flatMap(c => Object.keys(NS.CATALOG).filter(k => NS.CATALOG[k].cat === c).map(k => { const m = NS.CATALOG[k]; return h('tr', h('td', m.label), h('td', m.cat), h('td', m.ok ? '✔ constructeur' : '≈ typique'), h('td', m.source || '—')); })))) },
+    { id: 'licence', label: 'Licence et auteur', render: () => h('div', { style: { maxWidth: '640px' } },
+      h('div.lic-box',
+        h('p', 'Simulateur Réseau est développé par ', h('b', 'Yahn LE PRETTRE – Formaxion Landes'), '.'),
+        h('p', '© 2026 Yahn LE PRETTRE – Formaxion Landes'),
+        h('p', 'Le logiciel est distribué sous licence libre ', h('b', 'EUPL 1.2'), ' (European Union Public Licence). Vous pouvez l\'utiliser, l\'étudier, le modifier et le redistribuer dans le respect des conditions de cette licence — notamment le maintien de l\'accès au code source des versions redistribuées.'),
+        h('div.btns',
+          h('a', { href: 'https://github.com/YahnLP/simulateur-reseau', target: '_blank', rel: 'noopener', style: { textDecoration: 'none' } }, h('button', 'Consulter le code source')),
+          h('a', { href: 'https://interoperable-europe.ec.europa.eu/collection/eupl/eupl-text-eupl-12', target: '_blank', rel: 'noopener', style: { textDecoration: 'none' } }, h('button', 'Consulter la licence EUPL 1.2'))),
+        h('details.lic-more', h('summary', 'Nom, identité visuelle et évolutions futures'),
+          h('h4', 'Nom et identité du projet'),
+          h('p', 'Le nom « Simulateur Réseau », les logos et éléments d\'identité visuelle associés restent la propriété de Yahn LE PRETTRE / Formaxion Landes. Leur utilisation n\'est pas automatiquement accordée par la licence EUPL applicable au code source.'),
+          h('h4', 'Évolution du projet'),
+          h('p', 'La version actuelle de Simulateur Réseau est distribuée sous licence EUPL 1.2. Les versions diffusées sous cette licence continueront à bénéficier des droits accordés par l\'EUPL. Le titulaire des droits se réserve cependant la possibilité de développer et proposer ultérieurement d\'autres éditions ou services, notamment des versions professionnelles ou commerciales, sous des conditions de licence distinctes.'),
+          h('h4', 'Contributions'),
+          h('p', 'Les contributions externes sont les bienvenues et doivent respecter la licence du projet — voir ', h('code', 'CONTRIBUTING.md'), ' sur le dépôt GitHub.')))) },
   ], { first: first || 'use' });
   ui.modal('Aide', h('div', { style: { width: 'min(860px,86vw)', height: '62vh', display: 'flex' } }, t), [{ label: 'Fermer' }]);
 }

@@ -1,4 +1,5 @@
 /* ui-core.js — utilitaires d'interface : création DOM, fenêtres, menus, boîtes de dialogue, icônes */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};

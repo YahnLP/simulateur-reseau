@@ -5,6 +5,7 @@
    Ces commandes n'existent que dans ce simulateur hors-ligne : elles agissent uniquement sur les
    équipements de la maquette et ne produisent aucun trafic réel. Objectif : comprendre les attaques
    de couche 2/3 les plus courantes en TP et vérifier les contre-mesures (port-security, DAI, etc.). */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};

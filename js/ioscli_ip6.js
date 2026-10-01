@@ -1,4 +1,5 @@
 /* ioscli_ip6.js — commandes IOS : IPv6 (adresses, ND, routes statiques, show, clear) */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};

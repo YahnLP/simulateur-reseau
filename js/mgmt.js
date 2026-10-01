@@ -1,4 +1,5 @@
 /* mgmt.js — supervision : agent SNMP (MIB-II, IF-MIB, BRIDGE-MIB…), traps, gestionnaire (get/walk/set), syslog (client + serveur) */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};

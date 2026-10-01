@@ -1,6 +1,7 @@
 /* catalog.js — catalogue des équipements simulés avec leurs caractéristiques (fiches produits).
    ok:true  = valeurs relevées sur fiche constructeur (voir "source")
    ok:false = valeurs typiques/indicatives (à vérifier sur la fiche du produit réel utilisé en classe) */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};

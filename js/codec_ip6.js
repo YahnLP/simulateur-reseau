@@ -1,4 +1,5 @@
 /* codec_ip6.js — IPv6 : adresses (BigInt), en-tête, ICMPv6 et NDP (encodage / décodage / arbre analyseur) */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};

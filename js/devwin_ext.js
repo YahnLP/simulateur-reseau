@@ -1,4 +1,5 @@
 /* devwin_ext.js — onglets d'équipement ajoutés : téléphonie SIP, PBX, RADIUS, supplicant 802.1X, supervision SNMP/syslog, IPv6, et « Suivi » (états live des protocoles) */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};

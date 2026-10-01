@@ -1,4 +1,5 @@
 /* codec_aaa.js — MD5/HMAC-MD5, RADIUS (RFC 2865/2866/3579), EAP, EAPOL (802.1X) */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};

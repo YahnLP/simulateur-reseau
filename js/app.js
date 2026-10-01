@@ -1,4 +1,5 @@
 /* app.js — application : canvas de topologie, palette, câblage, boucle de simulation, inspecteur */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};

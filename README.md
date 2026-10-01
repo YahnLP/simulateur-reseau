@@ -1,6 +1,6 @@
 # Simulateur Réseau — Bac Pro CIEL / BTS SIO SISR
 
-Créé par Yahn LE PRETTRE — Formaxion Landes
+Créé par Yahn LE PRETTRE — Formaxion Landes · [Licence EUPL 1.2](LICENSE)
 
 Simulateur réseau pédagogique hors-ligne, type Filius/Packet Tracer, avec analyseur de trames intégré (type Wireshark). Aucun serveur, aucune installation : ouvrez `index.html` (ou le fichier autonome `dist/simulateur-reseau.html`) dans Chrome/Edge/Firefox.
 
@@ -22,6 +22,24 @@ Simulateur réseau pédagogique hors-ligne, type Filius/Packet Tracer, avec anal
 ## Limites connues (non simulé)
 
 SNMPv3, IPv6 sur TCP/UDP applicatifs avancés, ACL IPv6, NAT-T/DPD/IKEv2, cryptographie réelle (chiffrements symboliques), CUCM/CME, VLAN hopping et SYN flood (abordés en cours), stacking/MSTP sur l'OmniSwitch.
+
+## Licence
+
+**Simulateur Réseau** est distribué sous licence libre **EUPL 1.2** (European Union Public Licence, version 1.2) — texte officiel complet dans le fichier [`LICENSE`](LICENSE), également disponible sur le site de la Commission européenne : [interoperable-europe.ec.europa.eu/collection/eupl/eupl-text-eupl-12](https://interoperable-europe.ec.europa.eu/collection/eupl/eupl-text-eupl-12) (ex-« Joinup », l'ancienne adresse joinup.ec.europa.eu redirige automatiquement).
+
+En résumé (ce résumé ne remplace pas le texte de la licence, seul juridiquement contraignant) :
+
+- vous pouvez **utiliser**, **étudier**, **modifier** et **redistribuer** le logiciel, gratuitement, y compris dans un cadre professionnel ;
+- si vous redistribuez le logiciel ou une version modifiée, le **code source doit rester accessible** aux personnes qui le reçoivent, conformément aux obligations de l'EUPL (article 5, clause de copyleft) ;
+- les **droits d'auteur** sur le projet original restent détenus par Yahn LE PRETTRE / Formaxion Landes ;
+- la publication sous EUPL **n'empêche pas** le titulaire des droits de proposer ultérieurement **d'autres éditions** du logiciel sous une licence différente, notamment une version commerciale — cette possibilité ne retire rien aux droits déjà accordés sur les versions publiées sous EUPL ;
+- le nom « Simulateur Réseau », son logo et son identité visuelle restent la propriété de Yahn LE PRETTRE / Formaxion Landes ; leur usage n'est pas automatiquement accordé par la licence EUPL applicable au code source ;
+- les **contributions externes** sont les bienvenues (voir [`CONTRIBUTING.md`](CONTRIBUTING.md)) ; une contribution significative pourra faire l'objet d'un accord complémentaire avant son intégration, notamment si elle doit pouvoir figurer dans une future édition propriétaire.
+
+```
+Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes
+Licensed under the European Union Public Licence (EUPL), version 1.2.
+```
 
 ## Développement
 

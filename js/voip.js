@@ -1,5 +1,6 @@
 /* voip.js — téléphonie IP : agent SIP (téléphone IP / softphone), PBX de type Asterisk (enregistrement, digest, appels, trunks),
    RTP G.711/G.722/G.729 avec statistiques (perte, gigue, délai, MOS E-model), téléphone à 2 ports avec VLAN voix appris par CDP. */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {}; const { IP, Codec } = NS;

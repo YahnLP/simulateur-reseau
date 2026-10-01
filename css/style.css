@@ -1,3 +1,4 @@
+/* style.css — Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 :root{--bg:#eef1f5;--panel:#fff;--ink:#1e293b;--muted:#64748b;--line:#d5dbe4;--brand:#1d4ed8;--brand2:#e0e9ff;--ok:#15803d;--warn:#b45309;--err:#b91c1c;--top:#0f172a;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
@@ -124,6 +125,9 @@ fieldset{border:1px solid var(--line);border-radius:6px;padding:6px 10px 10px}le
 .tp h3{margin:0 0 4px}.tp .lvl{display:inline-block;background:#e0e7ff;color:#3730a3;border-radius:10px;padding:0 8px;font-size:11px;margin-bottom:6px}.tp ol{padding-left:18px}.tp li{margin:4px 0}.tp code{background:#f1f5f9;padding:0 4px;border-radius:3px;font-family:var(--mono);font-size:12px}
 .tp .legal{background:#fef2f2;border:1px solid #fecaca;border-left:4px solid #dc2626;border-radius:6px;padding:8px 10px;margin:8px 0;font-size:12.5px;color:#7f1d1d;line-height:1.5}.tp .legal b{color:#991b1b}
 .tp .check{border:1px solid var(--line);border-radius:6px;padding:6px 8px;margin:6px 0;background:#f8fafc}
+/* licence / à propos */
+.lic-box{background:#f0f9ff;border:1px solid #bae6fd;border-left:4px solid #0284c7;border-radius:6px;padding:10px 12px;margin:10px 0;font-size:12.5px;color:#0c4a6e;line-height:1.55}.lic-box b{color:#075985}.lic-box h4{margin:10px 0 4px;font-size:13px;color:#075985}.lic-box ul{margin:4px 0;padding-left:18px}.lic-box li{margin:2px 0}
+details.lic-more{margin-top:8px}details.lic-more summary{cursor:pointer;color:var(--brand);font-weight:600;font-size:12.5px}details.lic-more[open] summary{margin-bottom:6px}
 /* menus / dialogues / toasts */
 .ctxmenu{position:fixed;z-index:100;background:#fff;border:1px solid #94a3b8;border-radius:8px;box-shadow:0 8px 24px #0003;padding:4px;min-width:200px;max-height:70vh;overflow:auto}
 .mitem{display:block;width:100%;text-align:left;border:0;background:none;padding:5px 10px;border-radius:4px}.mitem:hover{background:var(--brand2)}.mtitle{padding:4px 10px;font-weight:600;color:#475569;font-size:12px}.sep{height:1px;background:var(--line);margin:4px 0}

@@ -1,5 +1,6 @@
 /* ospf.js — OSPFv2 (RFC 2328) : voisinage, élection DR/BDR, échange de bases (DBD/LSR/LSU/LSAck), LSDB, SPF (Dijkstra),
    multi-aires (ABR, LSA type 3/4), redistribution (LSA type 5, E2). Les paquets sont de vrais paquets OSPF (visibles dans l'analyseur). */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};

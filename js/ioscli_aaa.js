@@ -1,4 +1,5 @@
 /* ioscli_aaa.js — commandes IOS : AAA, RADIUS, 802.1X (dot1x / MAB), show / test / clear */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};

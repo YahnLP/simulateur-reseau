@@ -1,4 +1,5 @@
 /* ioscli_vpn.js — commandes IOS : GRE (interface Tunnel), IPsec/IKE (crypto isakmp, transform-set, crypto map, profile) */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};

@@ -1,4 +1,6 @@
 <!doctype html>
+<!-- Simulateur Réseau — Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2.
+     Texte complet de la licence : LICENSE (à la racine du dépôt) ou https://interoperable-europe.ec.europa.eu/collection/eupl/eupl-text-eupl-12 -->
 <html lang="fr">
 <head>
 <meta charset="utf-8">
@@ -6,6 +8,7 @@
 <title>Simulateur Réseau — Bac Pro CIEL / BTS SIO SISR</title>
 <meta name="author" content="Yahn LE PRETTRE - Formaxion Landes">
 <style>
+/* style.css — Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 :root{--bg:#eef1f5;--panel:#fff;--ink:#1e293b;--muted:#64748b;--line:#d5dbe4;--brand:#1d4ed8;--brand2:#e0e9ff;--ok:#15803d;--warn:#b45309;--err:#b91c1c;--top:#0f172a;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
@@ -132,6 +135,9 @@ fieldset{border:1px solid var(--line);border-radius:6px;padding:6px 10px 10px}le
 .tp h3{margin:0 0 4px}.tp .lvl{display:inline-block;background:#e0e7ff;color:#3730a3;border-radius:10px;padding:0 8px;font-size:11px;margin-bottom:6px}.tp ol{padding-left:18px}.tp li{margin:4px 0}.tp code{background:#f1f5f9;padding:0 4px;border-radius:3px;font-family:var(--mono);font-size:12px}
 .tp .legal{background:#fef2f2;border:1px solid #fecaca;border-left:4px solid #dc2626;border-radius:6px;padding:8px 10px;margin:8px 0;font-size:12.5px;color:#7f1d1d;line-height:1.5}.tp .legal b{color:#991b1b}
 .tp .check{border:1px solid var(--line);border-radius:6px;padding:6px 8px;margin:6px 0;background:#f8fafc}
+/* licence / à propos */
+.lic-box{background:#f0f9ff;border:1px solid #bae6fd;border-left:4px solid #0284c7;border-radius:6px;padding:10px 12px;margin:10px 0;font-size:12.5px;color:#0c4a6e;line-height:1.55}.lic-box b{color:#075985}.lic-box h4{margin:10px 0 4px;font-size:13px;color:#075985}.lic-box ul{margin:4px 0;padding-left:18px}.lic-box li{margin:2px 0}
+details.lic-more{margin-top:8px}details.lic-more summary{cursor:pointer;color:var(--brand);font-weight:600;font-size:12.5px}details.lic-more[open] summary{margin-bottom:6px}
 /* menus / dialogues / toasts */
 .ctxmenu{position:fixed;z-index:100;background:#fff;border:1px solid #94a3b8;border-radius:8px;box-shadow:0 8px 24px #0003;padding:4px;min-width:200px;max-height:70vh;overflow:auto}
 .mitem{display:block;width:100%;text-align:left;border:0;background:none;padding:5px 10px;border-radius:4px}.mitem:hover{background:var(--brand2)}.mtitle{padding:4px 10px;font-weight:600;color:#475569;font-size:12px}.sep{height:1px;background:var(--line);margin:4px 0}
@@ -210,6 +216,7 @@ fieldset{border:1px solid var(--line);border-radius:6px;padding:6px 10px 10px}le
 
 <script>
 /* util.js — adresses IP/MAC, octets, checksums */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
@@ -346,6 +353,7 @@ NS.B = { u16, u32, setU16, concat, checksum, strBytes, bytesStr, utf8Bytes, utf8
 /* catalog.js — catalogue des équipements simulés avec leurs caractéristiques (fiches produits).
    ok:true  = valeurs relevées sur fiche constructeur (voir "source")
    ok:false = valeurs typiques/indicatives (à vérifier sur la fiche du produit réel utilisé en classe) */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
@@ -481,6 +489,7 @@ NS.CABLES = [
 /* codec.js — encodage/décodage de VRAIES trames (octets) : Ethernet, 802.1Q, ARP, IPv4, ICMP, TCP, UDP,
    DHCP, DNS, HTTP, STP, RIPv2, OSPFv2, TLS (enregistrements), SSH (bannière), Telnet.
    parse(u8, true) produit aussi l'arbre de champs (avec décalages) pour l'analyseur de trames. */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
@@ -1220,6 +1229,7 @@ NS.Codec = Codec;
 </script>
 <script>
 /* codec_mgmt.js — SNMP (BER v1/v2c) et syslog : encodage / décodage / arbre pour l'analyseur */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
@@ -1329,6 +1339,7 @@ Codec.udpApps.push((p, u, o, end, detail) => {
 </script>
 <script>
 /* codec_ip6.js — IPv6 : adresses (BigInt), en-tête, ICMPv6 et NDP (encodage / décodage / arbre analyseur) */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
@@ -1493,6 +1504,7 @@ Codec.ethApps[0x86dd] = function (p, u, off, end, detail) {
 </script>
 <script>
 /* codec_vpn.js — GRE, ESP et ISAKMP/IKEv1 (encodage / décodage / arbre analyseur) */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
@@ -1627,6 +1639,7 @@ Codec.udpApps.push((p, u, o, end, detail) => {
 </script>
 <script>
 /* codec_aaa.js — MD5/HMAC-MD5, RADIUS (RFC 2865/2866/3579), EAP, EAPOL (802.1X) */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
@@ -1800,6 +1813,7 @@ Codec.eapolSummary = function (e) { return e.type === 0 && e.eap ? Codec.eapSumm
 </script>
 <script>
 /* codec_voip.js — SIP (texte), SDP, RTP, CDP (VLAN voix) : construction, décodage et arbre pour l'analyseur */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
@@ -1900,6 +1914,7 @@ Codec.udpApps.push((p, u, o, end, detail) => {
 </script>
 <script>
 /* sim.js — simulateur à événements discrets, ports, liens, captures */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
@@ -2057,6 +2072,7 @@ NS.Sim = Sim; NS.Port = Port; NS.Link = Link; NS.T0 = T0;
 <script>
 /* qos.js — moteur QoS : classification (DSCP/CoS/ACL/protocole), marquage, policer, file prioritaire (LLQ), débit limité (shape),
    confiance CoS/DSCP des switchs (mls qos). S'appuie sur des crochets de Sim.transmit : port.qos (émission) et port.qosIn (réception). */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {}; const { Codec } = NS;
@@ -2168,6 +2184,7 @@ NS.Qos = Qos;
 </script>
 <script>
 /* stack.js — équipement de base, interfaces L3, pile IP (ARP, IPv4, ICMP, UDP, TCP), routage, ACL, NAT */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
@@ -2729,6 +2746,7 @@ NS.Device = Device; NS.Iface = Iface; NS.IPNode = IPNode; NS.TcpConn = TcpConn;
 </script>
 <script>
 /* services.js — DHCP (client/serveur/relais), DNS (serveur/résolveur), HTTP/HTTPS (serveur/client), RIPv2 */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
@@ -3128,6 +3146,7 @@ if (NS.IPNode) { installResolver(NS.IPNode.prototype); installHttpClient(NS.IPNo
 </script>
 <script>
 /* tools.js — outils réseau partagés (ping en série, traceroute) utilisés par les terminaux */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
@@ -3197,6 +3216,7 @@ NS.tools = tools;
 </script>
 <script>
 /* mgmt.js — supervision : agent SNMP (MIB-II, IF-MIB, BRIDGE-MIB…), traps, gestionnaire (get/walk/set), syslog (client + serveur) */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
@@ -3534,6 +3554,7 @@ NS.Mgmt = Mgmt; NS.mib = { oa, os, cmpO, nameOf, parseOid, fmtVb, stamp, SEVN, F
 </script>
 <script>
 /* ip6.js — pile IPv6 : adresses (LL/GUA/ULA/SLAAC), DAD, NDP (NS/NA/RS/RA), voisins, routes, ICMPv6, ping/traceroute, transfert */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
@@ -3858,6 +3879,7 @@ NS.Ip6 = Ip6; NS.fmtIp = x => typeof x === 'bigint' ? IP6.strUp(x) : NS.IP.str(x
 </script>
 <script>
 /* vpn.js — tunnels GRE, IPsec (IKEv1 phase 1 main mode / phase 2 quick mode, ESP) sur les routeurs */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
@@ -4304,6 +4326,7 @@ if (NS.IPNode) patch(NS.IPNode); else NS._vpnPatch = patch;
 </script>
 <script>
 /* radius.js — serveur RADIUS (type FreeRADIUS/NPS), client AAA (routeur/switch), listes de méthodes */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
@@ -4506,6 +4529,7 @@ NS.Radius = Radius; NS.radiusUtil = { macDash, macCisco, macPlain, fdate };
 <script>
 /* voip.js — téléphonie IP : agent SIP (téléphone IP / softphone), PBX de type Asterisk (enregistrement, digest, appels, trunks),
    RTP G.711/G.722/G.729 avec statistiques (perte, gigue, délai, MOS E-model), téléphone à 2 ports avec VLAN voix appris par CDP. */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {}; const { IP, Codec } = NS;
@@ -4823,6 +4847,7 @@ NS.Sip = Sip; NS.Pbx = Pbx; NS.initPhone = initPhone; NS.voipUtil = { mos, mosLa
 </script>
 <script>
 /* dot1x.js — IEEE 802.1X : authentificateur (switch) + supplicant (poste), EAP-MD5 et PEAP simplifié, MAB, VLAN dynamique / invité */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
@@ -4998,6 +5023,7 @@ if (NS.IPNode) { const P = NS.IPNode.prototype; const in0 = P.input; P.input = f
 </script>
 <script>
 /* stp.js — Spanning Tree par VLAN : PVST+ (802.1D) et Rapid-PVST+ (802.1w), root guard, BPDU guard, propagation de changement de topologie */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
@@ -5242,6 +5268,7 @@ NS.Stp = Stp;
 </script>
 <script>
 /* lag.js — EtherChannel : LACP (802.3ad), PAgP (Cisco) et mode « on », ports logiques Port-channel */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
@@ -5391,6 +5418,7 @@ NS.installLag = install; NS.ChanPort = ChanPort; NS.LACP_MAC = LACP_MAC; NS.PAGP
 <script>
 /* ospf.js — OSPFv2 (RFC 2328) : voisinage, élection DR/BDR, échange de bases (DBD/LSR/LSU/LSAck), LSDB, SPF (Dijkstra),
    multi-aires (ABR, LSA type 3/4), redistribution (LSA type 5, E2). Les paquets sont de vrais paquets OSPF (visibles dans l'analyseur). */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
@@ -5964,6 +5992,7 @@ NS.Ospf = Ospf;
 </script>
 <script>
 /* devices.js — Hôtes, hub, switch (VLAN/trunk/STP/port-security/SVI), routeur, pare-feu, borne Wi-Fi, box */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
@@ -6372,6 +6401,7 @@ NS.createDevice = createDevice; NS.wifiRefresh = wifiRefresh; NS.buildPorts = bu
 <script>
 /* ioscli.js — interpréteur de commandes de type Cisco IOS pour routeurs et commutateurs
    (modes user/priv/config/interface/line/router/dhcp/acl/vlan, abréviations, ?, show, write, telnet/ssh serveur) */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
@@ -7302,6 +7332,7 @@ NS.genConfig = genConfig;
 </script>
 <script>
 /* ioscli_l2.js — commandes IOS : Spanning Tree (PVST+/Rapid-PVST+, guards) et EtherChannel (LACP/PAgP) */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
@@ -7476,6 +7507,7 @@ cmd('exec', 'show pagp [<x>] [<y>]', (s, a, io) => {
 </script>
 <script>
 /* ioscli_l3.js — commandes IOS : OSPF */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
@@ -7536,6 +7568,7 @@ cmd('exec', 'show ip protocols', (s, a, io) => {
 </script>
 <script>
 /* ioscli_mgmt.js — commandes IOS : SNMP et syslog */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
@@ -7622,6 +7655,7 @@ NS.mgmtConfig = function (dev, p) {
 </script>
 <script>
 /* ioscli_ip6.js — commandes IOS : IPv6 (adresses, ND, routes statiques, show, clear) */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
@@ -7744,6 +7778,7 @@ NS.ip6IsHost = () => false;
 </script>
 <script>
 /* ioscli_vpn.js — commandes IOS : GRE (interface Tunnel), IPsec/IKE (crypto isakmp, transform-set, crypto map, profile) */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
@@ -7932,6 +7967,7 @@ cmd('priv', 'undebug crypto ipsec', (s) => { if (V(s)) V(s).debug.ipsec = false;
 </script>
 <script>
 /* ioscli_aaa.js — commandes IOS : AAA, RADIUS, 802.1X (dot1x / MAB), show / test / clear */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
@@ -8062,6 +8098,7 @@ cmd('priv', 'clear authentication sessions [<x...>]', (s, a, io) => { const r = 
 /* aos.js — Alcatel-Lucent OmniSwitch 6400-P48 : CLI AOS 6.4 (pas de mode enable/configure, invite « -> »),
    VLAN (default/802.1q), interfaces IP, routes statiques, spantree, linkagg LACP, PoE (lanpower), 802.1X/RADIUS, port-security.
    La sortie des commandes reprend la présentation d'AOS ; elle est reconstituée (pas de capture sur matériel réel). */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {}; const { IP, Codec } = NS; const U = () => NS.iosUtil;
@@ -8406,6 +8443,7 @@ NS.AosSession = AosSession;
 </script>
 <script>
 /* ioscli_qos.js — commandes IOS : class-map, policy-map, service-policy, mls qos, auto qos voip, show policy-map / mls qos */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
@@ -8507,6 +8545,7 @@ NS.qosIfLines = function (pt, ln) {
 </script>
 <script>
 /* host_persist.js — sérialisation des services d'hôte ajoutés après coup : SNMP/syslog, IPv6, serveur RADIUS, supplicant 802.1X */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {}; const { IP, Host } = NS; const IP6 = NS.IP6;
@@ -8541,6 +8580,7 @@ Host.prototype.restore = function (b) {
 </script>
 <script>
 /* hostshell.js — terminaux des postes : invite de commandes Windows (FR) et shell Linux simplifié */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
@@ -8827,6 +8867,7 @@ NS.Host.prototype.newSession = function () { return new HostShell(this); };
 </script>
 <script>
 /* hostshell_mgmt.js — commandes Linux de supervision : snmpget/snmpwalk/…, snmptrap, logger, rsyslog/snmpd/snmptrapd */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
@@ -8957,6 +8998,7 @@ L.systemctl = function (a, io) {
 </script>
 <script>
 /* hostshell_ip6.js — IPv6 côté postes : ip -6, ping -6/ping6, traceroute6, ipconfig, netsh interface ipv6 */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
@@ -9159,6 +9201,7 @@ W.route = function (a, io) {
 </script>
 <script>
 /* hostshell_aaa.js — serveur Linux FreeRADIUS (systemctl, radtest, users, clients.conf, radius.log) et supplicant 802.1X côté client */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {}; const { IP, Codec, HostShell } = NS; const L = HostShell.prototype.linCmds;
@@ -9229,6 +9272,7 @@ L['wpa_supplicant-sim'] = function (a, io) {
 </script>
 <script>
 /* hostshell_voip.js — Linux : Asterisk (asterisk -rx, systemctl, sip.conf/extensions.conf, journaux) ; Linux/Windows : softphone en ligne de commande `sipphone` */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {}; const { IP, Codec, HostShell } = NS; const L = HostShell.prototype.linCmds, W = HostShell.prototype.winCmds; const U = NS.voipUtil;
@@ -9311,6 +9355,7 @@ L.sipphone = sipphone; if (W) W.sipphone = sipphone;
    Ces commandes n'existent que dans ce simulateur hors-ligne : elles agissent uniquement sur les
    équipements de la maquette et ne produisent aucun trafic réel. Objectif : comprendre les attaques
    de couche 2/3 les plus courantes en TP et vérifier les contre-mesures (port-security, DAI, etc.). */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
@@ -9400,6 +9445,7 @@ if (NS.HostShell) {
 </script>
 <script>
 /* analyzer.js — moteur d'analyse de trames (sans DOM) : résumé, filtres d'affichage, flux TCP, statistiques, pcap */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
@@ -9792,6 +9838,7 @@ NS.Analyzer = A;
 </script>
 <script>
 /* topology.js — sauvegarde / chargement d'une topologie (JSON) */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
@@ -9846,6 +9893,7 @@ NS.loadTopology = function (sim, data) {
 </script>
 <script>
 /* ui-core.js — utilitaires d'interface : création DOM, fenêtres, menus, boîtes de dialogue, icônes */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
@@ -9997,6 +10045,7 @@ NS.ui = { toast, menu, closeMenu, modal, ask, confirmBox, openWindow, closeAllWi
 </script>
 <script>
 /* term.js — terminal (console) branché sur une session IOS ou shell hôte */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
@@ -10070,6 +10119,7 @@ NS.Terminal = function (dev, opts) {
 </script>
 <script>
 /* devwin.js — fenêtres d'équipements : configuration graphique, terminal, services, navigateur, fiche technique */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
@@ -10403,6 +10453,7 @@ NS.openDevice = function (app, dev, first) {
 </script>
 <script>
 /* devwin_ext.js — onglets d'équipement ajoutés : téléphonie SIP, PBX, RADIUS, supplicant 802.1X, supervision SNMP/syslog, IPv6, et « Suivi » (états live des protocoles) */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
@@ -10553,6 +10604,7 @@ NS.extraTabs = function (app, dev, m, add) {
 </script>
 <script>
 /* wireshark.js — interface de l'analyseur de trames intégré (liste, détail, hexdump, filtres, flux TCP, stats, pcap) */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
@@ -10705,6 +10757,7 @@ NS.createAnalyzerUI = function (app, host) {
 </script>
 <script>
 /* app.js — application : canvas de topologie, palette, câblage, boucle de simulation, inspecteur */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
@@ -11005,6 +11058,7 @@ NS.App = App;
 </script>
 <script>
 /* scenarios.js — TP d'exemple (topologie de départ, correction, vérifications) et matrice de couverture du programme */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
@@ -12220,6 +12274,7 @@ NS.COVERAGE = {
 </script>
 <script>
 /* main.js — démarrage : barre d'outils, dock (analyseur/journal), fichiers, TP, aide */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function () {
 'use strict';
 const NS = window.NS; const { h, $, $$, clear, ui } = NS;
@@ -12361,6 +12416,21 @@ function helpModal(first) {
       h('p.small', 'Références : ', cov.sources.map(s => h('span', h('a', { href: s[1], target: '_blank', rel: 'noopener' }, s[0]), ' · ')))) },
     { id: 'prod', label: 'Produits et fiches', render: () => h('div', h('p.muted', '✔ = caractéristiques relevées sur la fiche constructeur (source indiquée). ≈ = valeurs typiques ou indicatives : à vérifier sur la fiche du produit réel.'),
       h('table.cov', h('tr', h('th', 'Équipement'), h('th', 'Catégorie'), h('th', 'Fiche'), h('th', 'Source')), NS.CAT_ORDER.flatMap(c => Object.keys(NS.CATALOG).filter(k => NS.CATALOG[k].cat === c).map(k => { const m = NS.CATALOG[k]; return h('tr', h('td', m.label), h('td', m.cat), h('td', m.ok ? '✔ constructeur' : '≈ typique'), h('td', m.source || '—')); })))) },
+    { id: 'licence', label: 'Licence et auteur', render: () => h('div', { style: { maxWidth: '640px' } },
+      h('div.lic-box',
+        h('p', 'Simulateur Réseau est développé par ', h('b', 'Yahn LE PRETTRE – Formaxion Landes'), '.'),
+        h('p', '© 2026 Yahn LE PRETTRE – Formaxion Landes'),
+        h('p', 'Le logiciel est distribué sous licence libre ', h('b', 'EUPL 1.2'), ' (European Union Public Licence). Vous pouvez l\'utiliser, l\'étudier, le modifier et le redistribuer dans le respect des conditions de cette licence — notamment le maintien de l\'accès au code source des versions redistribuées.'),
+        h('div.btns',
+          h('a', { href: 'https://github.com/YahnLP/simulateur-reseau', target: '_blank', rel: 'noopener', style: { textDecoration: 'none' } }, h('button', 'Consulter le code source')),
+          h('a', { href: 'https://interoperable-europe.ec.europa.eu/collection/eupl/eupl-text-eupl-12', target: '_blank', rel: 'noopener', style: { textDecoration: 'none' } }, h('button', 'Consulter la licence EUPL 1.2'))),
+        h('details.lic-more', h('summary', 'Nom, identité visuelle et évolutions futures'),
+          h('h4', 'Nom et identité du projet'),
+          h('p', 'Le nom « Simulateur Réseau », les logos et éléments d\'identité visuelle associés restent la propriété de Yahn LE PRETTRE / Formaxion Landes. Leur utilisation n\'est pas automatiquement accordée par la licence EUPL applicable au code source.'),
+          h('h4', 'Évolution du projet'),
+          h('p', 'La version actuelle de Simulateur Réseau est distribuée sous licence EUPL 1.2. Les versions diffusées sous cette licence continueront à bénéficier des droits accordés par l\'EUPL. Le titulaire des droits se réserve cependant la possibilité de développer et proposer ultérieurement d\'autres éditions ou services, notamment des versions professionnelles ou commerciales, sous des conditions de licence distinctes.'),
+          h('h4', 'Contributions'),
+          h('p', 'Les contributions externes sont les bienvenues et doivent respecter la licence du projet — voir ', h('code', 'CONTRIBUTING.md'), ' sur le dépôt GitHub.')))) },
   ], { first: first || 'use' });
   ui.modal('Aide', h('div', { style: { width: 'min(860px,86vw)', height: '62vh', display: 'flex' } }, t), [{ label: 'Fermer' }]);
 }

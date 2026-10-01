@@ -1,4 +1,5 @@
 /* tools.js — outils réseau partagés (ping en série, traceroute) utilisés par les terminaux */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};

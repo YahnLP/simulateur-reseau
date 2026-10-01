@@ -1,4 +1,5 @@
 /* hostshell.js — terminaux des postes : invite de commandes Windows (FR) et shell Linux simplifié */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};

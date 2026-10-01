@@ -1,4 +1,5 @@
 /* devwin.js — fenêtres d'équipements : configuration graphique, terminal, services, navigateur, fiche technique */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};

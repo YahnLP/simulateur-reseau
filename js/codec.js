@@ -1,6 +1,7 @@
 /* codec.js — encodage/décodage de VRAIES trames (octets) : Ethernet, 802.1Q, ARP, IPv4, ICMP, TCP, UDP,
    DHCP, DNS, HTTP, STP, RIPv2, OSPFv2, TLS (enregistrements), SSH (bannière), Telnet.
    parse(u8, true) produit aussi l'arbre de champs (avec décalages) pour l'analyseur de trames. */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};

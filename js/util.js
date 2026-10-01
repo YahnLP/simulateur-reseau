@@ -1,4 +1,5 @@
 /* util.js — adresses IP/MAC, octets, checksums */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};

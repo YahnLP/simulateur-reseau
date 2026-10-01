@@ -1,4 +1,5 @@
 /* lag.js — EtherChannel : LACP (802.3ad), PAgP (Cisco) et mode « on », ports logiques Port-channel */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};

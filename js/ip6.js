@@ -1,4 +1,5 @@
 /* ip6.js — pile IPv6 : adresses (LL/GUA/ULA/SLAAC), DAD, NDP (NS/NA/RS/RA), voisins, routes, ICMPv6, ping/traceroute, transfert */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};

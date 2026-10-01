@@ -1,4 +1,5 @@
 /* ioscli_qos.js — commandes IOS : class-map, policy-map, service-policy, mls qos, auto qos voip, show policy-map / mls qos */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};

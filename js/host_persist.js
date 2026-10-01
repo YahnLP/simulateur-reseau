@@ -1,4 +1,5 @@
 /* host_persist.js — sérialisation des services d'hôte ajoutés après coup : SNMP/syslog, IPv6, serveur RADIUS, supplicant 802.1X */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {}; const { IP, Host } = NS; const IP6 = NS.IP6;

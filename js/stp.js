@@ -1,4 +1,5 @@
 /* stp.js — Spanning Tree par VLAN : PVST+ (802.1D) et Rapid-PVST+ (802.1w), root guard, BPDU guard, propagation de changement de topologie */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};

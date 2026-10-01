@@ -1,4 +1,5 @@
 /* devices.js — Hôtes, hub, switch (VLAN/trunk/STP/port-security/SVI), routeur, pare-feu, borne Wi-Fi, box */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};

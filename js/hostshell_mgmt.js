@@ -1,4 +1,5 @@
 /* hostshell_mgmt.js — commandes Linux de supervision : snmpget/snmpwalk/…, snmptrap, logger, rsyslog/snmpd/snmptrapd */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};

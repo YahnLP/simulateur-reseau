@@ -1,4 +1,5 @@
 /* hostshell_aaa.js — serveur Linux FreeRADIUS (systemctl, radtest, users, clients.conf, radius.log) et supplicant 802.1X côté client */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {}; const { IP, Codec, HostShell } = NS; const L = HostShell.prototype.linCmds;

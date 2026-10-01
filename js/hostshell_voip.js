@@ -1,4 +1,5 @@
 /* hostshell_voip.js — Linux : Asterisk (asterisk -rx, systemctl, sip.conf/extensions.conf, journaux) ; Linux/Windows : softphone en ligne de commande `sipphone` */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {}; const { IP, Codec, HostShell } = NS; const L = HostShell.prototype.linCmds, W = HostShell.prototype.winCmds; const U = NS.voipUtil;

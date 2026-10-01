@@ -1,4 +1,5 @@
 /* codec_mgmt.js — SNMP (BER v1/v2c) et syslog : encodage / décodage / arbre pour l'analyseur */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};

@@ -1,6 +1,7 @@
 /* aos.js — Alcatel-Lucent OmniSwitch 6400-P48 : CLI AOS 6.4 (pas de mode enable/configure, invite « -> »),
    VLAN (default/802.1q), interfaces IP, routes statiques, spantree, linkagg LACP, PoE (lanpower), 802.1X/RADIUS, port-security.
    La sortie des commandes reprend la présentation d'AOS ; elle est reconstituée (pas de capture sur matériel réel). */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {}; const { IP, Codec } = NS; const U = () => NS.iosUtil;

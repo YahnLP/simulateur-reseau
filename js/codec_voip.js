@@ -1,4 +1,5 @@
 /* codec_voip.js — SIP (texte), SDP, RTP, CDP (VLAN voix) : construction, décodage et arbre pour l'analyseur */
+/* Copyright © 2026 Yahn LE PRETTRE – Formaxion Landes. Licensed under the EUPL-1.2. */
 (function (g) {
 'use strict';
 const NS = g.NS = g.NS || {};
