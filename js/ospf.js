@@ -225,9 +225,14 @@ class Ospf {
     if (n.state === 'ExStart') {
       if (d.init && d.more && d.master && d.headers.length === 0 && n.rid > this.ridActive) { // je suis esclave
         if (n.dbdT) this.sim.cancel(n.dbdT); n.master = false; n.ddSeq = d.seq; n.state = 'Exchange'; this.logAdj(n, 'EXSTART', 'EXCHANGE', 'Negotiation Done');
+        // la base peut avoir changé entre l'entrée en ExStart (startExStart) et ce moment réel
+        // d'échange (plusieurs secondes, cf. retransmission du DBD initial) : on rafraîchit la
+        // liste des en-têtes à envoyer plutôt que d'utiliser l'instantané potentiellement périmé.
+        n.hdrs = this.headersFor(n.oi); n.hi = 0;
         this.slaveReply(n, d, true);
       } else if (!d.init && !d.master && d.seq === n.ddSeq && n.rid < this.ridActive) { // je suis maître
         if (n.dbdT) this.sim.cancel(n.dbdT); n.master = true; n.state = 'Exchange'; this.logAdj(n, 'EXSTART', 'EXCHANGE', 'Negotiation Done');
+        n.hdrs = this.headersFor(n.oi); n.hi = 0;
         this.takeHeaders(n, d); this.masterNext(n, d);
       }
       return;
