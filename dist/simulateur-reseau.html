@@ -6286,15 +6286,27 @@ class Firewall extends IPNode {
   }
   serialize() {
     const b = super.serialize();
-    b.fw = { ifaces: this.ifaceList().map(i => ({ name: i.name, ip: i.ip && !i.dhcpLeased ? IP.str(i.ip) : '', mask: i.mask && !i.dhcpLeased ? IP.str(i.mask) : '', dhcp: !!i.dhcp, zone: i.zone, up: i.adminUp })), rules: this.rules, natMasq: this.natMasq, forwards: this.forwards, wanPing: this.wanPing, dhcpd: { enabled: this.dhcpd.enabled, pools: this.dhcpd.pools, excluded: this.dhcpd.excluded } };
+    b.fw = {
+      ifaces: this.ifaceList().map(i => ({ name: i.name, ip: i.ip && !i.dhcpLeased ? IP.str(i.ip) : '', mask: i.mask && !i.dhcpLeased ? IP.str(i.mask) : '', dhcp: !!i.dhcp, zone: i.zone, up: i.adminUp, nat: i.nat || null })),
+      rules: this.rules, natMasq: this.natMasq, forwards: this.forwards, wanPing: this.wanPing,
+      // routes statiques (ex. route par défaut vers le FAI) : sans ceci, toute route non
+      // directement connectée configurée sur le pare-feu est perdue à l'enregistrement.
+      statics: this.statics.map(s => ({ net: IP.str(s.net), mask: IP.str(s.mask), nh: s.nh ? IP.str(s.nh) : '', iface: s.iface || null, ad: s.ad || 1 })),
+      dhcpd: { enabled: this.dhcpd.enabled, pools: this.dhcpd.pools, excluded: this.dhcpd.excluded },
+    };
     return b;
   }
   restore(b) {
     const f = b.fw; if (!f) return;
     f.ifaces.forEach(c => { const i = this.ifaceByName(c.name); if (!i) return; i.zone = c.zone; i.adminUp = c.up !== false; if (c.dhcp) this.enableDhcp(i, true); else { this.enableDhcp(i, false); i.ip = c.ip ? IP.parse(c.ip) : 0; i.mask = c.mask ? IP.parseMask(c.mask) : 0; } });
     this.rules = f.rules || []; this.natMasq = f.natMasq || []; this.forwards = f.forwards || []; this.wanPing = !!f.wanPing;
+    this.statics = (f.statics || []).map(s => ({ net: s.net ? IP.parse(s.net) : 0, mask: s.mask ? IP.parseMask(s.mask) : 0, nh: s.nh ? IP.parse(s.nh) : 0, iface: s.iface || null, ad: s.ad || 1 }));
     if (f.dhcpd) { this.dhcpd.enabled = f.dhcpd.enabled; this.dhcpd.pools = f.dhcpd.pools || []; this.dhcpd.excluded = f.dhcpd.excluded || []; }
     this.rebuildNat();
+    // rebuildNat() ne connaît que natMasq/forwards ; on réapplique par-dessus le marquage NAT
+    // explicite des interfaces (ex. DMZ laissée "inside" sans masquerade dynamique propre),
+    // désormais persisté, pour ne pas perdre une politique NAT affinée à la main.
+    f.ifaces.forEach(c => { if (!c.nat) return; const i = this.ifaceByName(c.name); if (i && !i.nat) i.nat = c.nat; });
   }
 }
 
@@ -11482,7 +11494,9 @@ SC.push({
   objectives: ['Comprendre l\'enregistrement SIP (digest) et l\'établissement d\'un appel (INVITE/RTP)', 'Configurer le VLAN voix sur un port de switch et l\'observer via CDP', 'Mettre en œuvre une politique de qualité de service (LLQ) et en mesurer l\'effet sur le MOS'],
   steps: [
     'Sur SW1, les ports des téléphones : <code>switchport access vlan 10</code> (VLAN données), <code>switchport voice vlan 20</code> (VLAN voix, annoncé aux téléphones par CDP).',
-    'Sur chaque téléphone (onglet <b>Téléphone (SIP)</b>) : configurez le numéro, le secret et l\'adresse du PBX, puis « S\'enregistrer ». Vérifiez l\'état « enregistré ».',
+    'Il n\'y a pas de serveur DHCP sur le VLAN voix : sur chaque téléphone (onglet <b>Configuration IP</b>), donnez une adresse IP statique dans ce sous-réseau, par ex. <code>192.168.20.11/24</code> (passerelle 192.168.20.1) pour T1 et <code>192.168.20.12/24</code> pour T2.',
+    'Sur le PBX (double-cliquez sur PBX, onglet <b>PBX (Asterisk)</b>) : cochez « Service Asterisk démarré », puis ajoutez un poste par téléphone (extension + mot de passe + nom) — par ex. <code>1001</code>/<code>pass1</code> pour T1 et <code>1002</code>/<code>pass2</code> pour T2. Sans ces postes déclarés côté PBX, l\'enregistrement SIP échoue (timeout) même si le téléphone est bien adressé.',
+    'Sur chaque téléphone (onglet <b>Téléphone (SIP)</b>) : configurez le même numéro et le même secret que le poste créé sur le PBX, l\'adresse du PBX (192.168.20.5), puis « S\'enregistrer ». Vérifiez l\'état « enregistré ».',
     'Depuis T1, appelez le numéro de T2 : décrochez côté T2. Observez dans l\'onglet Téléphone les statistiques d\'appel (MOS, gigue, perte).',
     'Analyseur sur le lien menant à un téléphone : filtres <code>sip</code> puis <code>rtp</code>. Relevez l\'étiquette VLAN voix et le marquage DSCP (EF pour RTP, CS3 pour SIP).',
     'Sans politique de QoS, lancez un fort trafic de données concurrent sur le même lien : le MOS chute. Appliquez une politique LLQ (priorité au trafic voix) sur l\'interface et recommencez : le MOS revient à un niveau correct.',
