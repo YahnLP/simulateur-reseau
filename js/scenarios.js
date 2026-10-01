@@ -493,7 +493,9 @@ SC.push({
   objectives: ['Comprendre l\'enregistrement SIP (digest) et l\'établissement d\'un appel (INVITE/RTP)', 'Configurer le VLAN voix sur un port de switch et l\'observer via CDP', 'Mettre en œuvre une politique de qualité de service (LLQ) et en mesurer l\'effet sur le MOS'],
   steps: [
     'Sur SW1, les ports des téléphones : <code>switchport access vlan 10</code> (VLAN données), <code>switchport voice vlan 20</code> (VLAN voix, annoncé aux téléphones par CDP).',
-    'Sur chaque téléphone (onglet <b>Téléphone (SIP)</b>) : configurez le numéro, le secret et l\'adresse du PBX, puis « S\'enregistrer ». Vérifiez l\'état « enregistré ».',
+    'Il n\'y a pas de serveur DHCP sur le VLAN voix : sur chaque téléphone (onglet <b>Configuration IP</b>), donnez une adresse IP statique dans ce sous-réseau, par ex. <code>192.168.20.11/24</code> (passerelle 192.168.20.1) pour T1 et <code>192.168.20.12/24</code> pour T2.',
+    'Sur le PBX (double-cliquez sur PBX, onglet <b>PBX (Asterisk)</b>) : cochez « Service Asterisk démarré », puis ajoutez un poste par téléphone (extension + mot de passe + nom) — par ex. <code>1001</code>/<code>pass1</code> pour T1 et <code>1002</code>/<code>pass2</code> pour T2. Sans ces postes déclarés côté PBX, l\'enregistrement SIP échoue (timeout) même si le téléphone est bien adressé.',
+    'Sur chaque téléphone (onglet <b>Téléphone (SIP)</b>) : configurez le même numéro et le même secret que le poste créé sur le PBX, l\'adresse du PBX (192.168.20.5), puis « S\'enregistrer ». Vérifiez l\'état « enregistré ».',
     'Depuis T1, appelez le numéro de T2 : décrochez côté T2. Observez dans l\'onglet Téléphone les statistiques d\'appel (MOS, gigue, perte).',
     'Analyseur sur le lien menant à un téléphone : filtres <code>sip</code> puis <code>rtp</code>. Relevez l\'étiquette VLAN voix et le marquage DSCP (EF pour RTP, CS3 pour SIP).',
     'Sans politique de QoS, lancez un fort trafic de données concurrent sur le même lien : le MOS chute. Appliquez une politique LLQ (priorité au trafic voix) sur l\'interface et recommencez : le MOS revient à un niveau correct.',
