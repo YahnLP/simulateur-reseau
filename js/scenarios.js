@@ -998,6 +998,176 @@ SC.push({
   ],
 });
 
+/* ============================================================= Cybersécurité — TP 5 */
+SC.push({
+  id: 'cyber-telnetssh', diff: 1, title: 'Interception d\'identifiants en clair (Telnet) et migration vers SSH', level: 'Bac Pro CIEL / BTS SIO — Cybersécurité', duration: '45 min', cat: 'Cybersécurité',
+  desc: 'Le routeur R1 est administré en Telnet sur un concentrateur (hub) : tout le trafic y est répété sur tous les ports, y compris vers un poste « attaquant ». Observez le mot de passe en clair, puis migrez l\'administration vers SSH.',
+  objectives: ['Comprendre qu\'un concentrateur (hub) expose tout le trafic à tous les postes connectés', 'Repérer un mot de passe en clair dans une capture Telnet', 'Configurer SSH sur un routeur Cisco (biclé RSA, ligne vty) et constater le chiffrement obtenu'],
+  steps: [
+    'Depuis <b>ADMIN</b> : <code>telnet 192.168.1.1</code>, authentifiez-vous avec <code>formaxion2026</code>.',
+    'Clic droit sur le câble HUB1–R1 → <b>Analyser cette liaison</b>, filtre <code>tcp.port==23</code>, « Suivre le flux TCP » : le mot de passe apparaît en clair — <b>ATTAQUANT</b>, sur le même concentrateur, aurait pu le capturer lui aussi.',
+    'Sur R1 : <code>ip domain-name formaxion.local</code>, <code>crypto key generate rsa</code>, puis <code>line vty 0 4</code> / <code>transport input ssh</code>.',
+    'Depuis ADMIN : <code>ssh 192.168.1.1</code> et authentifiez-vous. Refaites l\'analyse de la même liaison : le contenu est désormais chiffré (octets aléatoires), le mot de passe n\'est plus lisible.',
+  ],
+  build(sim) {
+    const { dev, link, get } = mk(sim);
+    dev('hub', 'HUB1', 420, 220); dev('pc-linux', 'ADMIN', 200, 100); dev('laptop', 'ATTAQUANT', 200, 340); dev('r-2911', 'R1', 650, 220);
+    link('ADMIN', 'ens33', 'HUB1', 'Port1'); link('ATTAQUANT', 'Ethernet0', 'HUB1', 'Port2'); link('R1', 'GigabitEthernet0/0', 'HUB1', 'Port3');
+    hostIp(get('ADMIN'), '192.168.1.10', '24', '192.168.1.1'); hostIp(get('ATTAQUANT'), '192.168.1.20', '24');
+    cliRun(get('R1'), 'enable\nconf t\nhostname R1\ninterface GigabitEthernet0/0\nip address 192.168.1.1 255.255.255.0\nno shutdown\nexit\nenable secret formaxion2026\nline vty 0 4\npassword formaxion2026\nlogin\ntransport input telnet\nend');
+  },
+  solve(sim) {
+    const { get } = mk(sim);
+    cliRun(get('R1'), 'enable\nconf t\nip domain-name formaxion.local\ncrypto key generate rsa\nline vty 0 4\ntransport input ssh\nend');
+  },
+  checks: [
+    { label: 'SSH est opérationnel sur R1 après durcissement', run: c => {
+      let opened = false, done = false;
+      NS.tools.openRemote(c.get('ADMIN'), IP.parse('192.168.1.1'), 'ssh', { onOpen: send => { opened = true; send('formaxion2026'); c.sim.at(500, () => done = true); }, onText() { }, onClose() { done = true; }, onError() { done = true; } });
+      c.sim.runUntil(() => done, 8000);
+      return opened;
+    } },
+    { label: 'Le mot de passe ne circule plus en clair (session SSH chiffrée)', run: c => {
+      const before = c.sim.captures.length; let done = false;
+      NS.tools.openRemote(c.get('ADMIN'), IP.parse('192.168.1.1'), 'ssh', { onOpen: send => { send('formaxion2026'); c.sim.at(500, () => done = true); }, onText() { }, onClose() { done = true; }, onError() { done = true; } });
+      c.sim.runUntil(() => done, 8000);
+      const ascii = c.sim.captures.slice(before).map(r => { try { const p = NS.Codec.parse(r.bytes); return (p.tcp && p.tcp.payload && p.tcp.payload.length) ? NS.B.bytesStr(p.tcp.payload) : ''; } catch (e) { return ''; } }).join('|');
+      return !ascii.includes('formaxion2026');
+    } },
+  ],
+});
+
+/* ============================================================= Cybersécurité — TP 6 */
+SC.push({
+  id: 'cyber-auditfw', diff: 3, title: 'Audit de sécurité : scan de ports et durcissement d\'un pare-feu', level: 'BTS SIO — Cybersécurité', duration: '1 h', cat: 'Cybersécurité',
+  desc: 'Un auditeur (mandat écrit) scanne l\'adresse publique du pare-feu FW1 et découvre qu\'une redirection oubliée expose, sans nécessité, l\'administration Telnet d\'un routeur interne. Corrigez la politique en ne conservant que le strict nécessaire.',
+  objectives: ['Utiliser nmap dans le cadre d\'un audit autorisé et interpréter le rapport (open/closed/filtered)', 'Retrouver, dans la politique d\'un pare-feu, la règle de filtrage et la redirection NAT responsables d\'une exposition inutile', 'Appliquer le principe de moindre privilège en conservant uniquement les services réellement nécessaires'],
+  steps: [
+    'Depuis <b>AUDITEUR</b> (Internet, mandat écrit) : <code>nmap 203.0.113.2</code> (adresse publique de FW1).',
+    'Le port 23 apparaît <b>open</b> : ce n\'est pas cohérent avec le seul service que l\'entreprise doit publier (le site web, port 80).',
+    'Dans les propriétés de <b>FW1</b>, retrouvez la redirection NAT et la règle de filtrage WAN→DMZ qui exposent le port 23 vers <b>R-ADMIN</b> (équipement d\'administration interne).',
+    'Supprimez cette redirection et cette règle ; conservez uniquement la publication du port 80.',
+    'Relancez <code>nmap 203.0.113.2</code> : seul le port 80 doit rester ouvert.',
+  ],
+  build(sim) {
+    const { dev, link, get } = mk(sim);
+    dev('inet', 'ISP', 500, 200); dev('fw-fgt60f', 'FW1', 300, 200); dev('pc-linux', 'AUDITEUR', 700, 200);
+    dev('sw-8p', 'SW-LAN', 100, 100); dev('pc-linux', 'ADMIN', 50, 50); dev('sw-8p', 'SW-DMZ', 150, 350); dev('srv-linux', 'SRV-WEB', 50, 400); dev('r-1941', 'R-ADMIN', 250, 400);
+    link('FW1', 'wan1', 'ISP', 'gi0/0'); link('ISP', 'gi0/1', 'AUDITEUR', 'ens33');
+    link('FW1', 'internal1', 'SW-LAN', 'Port1'); link('ADMIN', 'ens33', 'SW-LAN', 'Port2');
+    link('FW1', 'dmz', 'SW-DMZ', 'Port1'); link('SRV-WEB', 'ens33', 'SW-DMZ', 'Port2'); link('R-ADMIN', 'gi0/0', 'SW-DMZ', 'Port3');
+    cliRun(get('ISP'), 'enable\nconf t\nhostname ISP\ninterface gi0/0\nip address 203.0.113.1 255.255.255.248\nno shutdown\ninterface gi0/1\nip address 198.51.100.1 255.255.255.0\nno shutdown\nend');
+    hostIp(get('AUDITEUR'), '198.51.100.2', '24', '198.51.100.1');
+    const fw = get('FW1');
+    const wan = fw.ifaceByName('wan1'); wan.ip = IP.parse('203.0.113.2'); wan.mask = IP.parseMask('255.255.255.248'); wan.adminUp = true; wan.dhcp = false;
+    const lan = fw.ifaceByName('internal1'); lan.ip = IP.parse('192.168.10.1'); lan.mask = IP.parseMask('255.255.255.0'); lan.adminUp = true;
+    const dmz = fw.ifaceByName('dmz'); dmz.ip = IP.parse('172.16.0.1'); dmz.mask = IP.parseMask('255.255.255.0'); dmz.adminUp = true;
+    fw.statics.push({ net: 0, mask: 0, nh: IP.parse('203.0.113.1'), iface: 'wan1', ad: 1 });
+    hostIp(get('ADMIN'), '192.168.10.10', '24', '192.168.10.1');
+    hostIp(get('SRV-WEB'), '172.16.0.10', '24', '172.16.0.1'); get('SRV-WEB').httpd.start();
+    cliRun(get('R-ADMIN'), 'enable\nconf t\nhostname R-ADMIN\ninterface gi0/0\nip address 172.16.0.20 255.255.255.0\nno shutdown\nexit\nip default-gateway 172.16.0.1\nenable secret formaxion2026\nline vty 0 4\npassword formaxion2026\nlogin\nend');
+    fw.rules = [
+      { on: true, action: 'pass', from: 'LAN', to: 'WAN', proto: 'any', src: 'any', dst: 'any', dport: 'any', comment: 'Accès Internet du LAN' },
+      { on: true, action: 'pass', from: 'LAN', to: 'DMZ', proto: 'any', src: 'any', dst: 'any', dport: 'any', comment: 'Administration de la DMZ depuis le LAN' },
+      { on: true, action: 'pass', from: 'DMZ', to: 'WAN', proto: 'any', src: 'any', dst: 'any', dport: 'any', comment: 'Mises à jour depuis la DMZ' },
+      { on: true, action: 'pass', from: 'WAN', to: 'DMZ', proto: 'tcp', src: 'any', dst: 'any', dport: '80', comment: 'Publication du site web (légitime)' },
+      { on: true, action: 'pass', from: 'WAN', to: 'DMZ', proto: 'tcp', src: 'any', dst: 'any', dport: '23', comment: 'À SUPPRIMER : oublié lors d\'une précédente intervention' },
+    ];
+    fw.natMasq = [{ from: 'LAN', to: 'WAN' }, { from: 'DMZ', to: 'WAN' }];
+    fw.forwards = [{ proto: 'tcp', port: 80, toIp: '172.16.0.10', toPort: 80 }, { proto: 'tcp', port: 23, toIp: '172.16.0.20', toPort: 23 }];
+    fw.rebuildNat();
+  },
+  solve(sim) {
+    const { get } = mk(sim); const fw = get('FW1');
+    fw.rules = fw.rules.filter(r => r.dport !== '23'); fw.forwards = fw.forwards.filter(f => f.port !== 23); fw.rebuildNat();
+  },
+  checks: [
+    { label: 'Le port 23 (administration interne) n\'est plus exposé depuis Internet', run: c => {
+      const s = c.get('AUDITEUR').newSession(); let out = '', done = false;
+      s.exec('nmap -p21,22,23,80 203.0.113.2', { print: t => out += t, done: () => done = true, clear() { } });
+      c.sim.runUntil(() => done, 20000);
+      return !/23\/tcp\s+open/.test(out);
+    } },
+    { label: 'Le port 80 (site web) reste accessible depuis Internet', run: c => {
+      const s = c.get('AUDITEUR').newSession(); let out = '', done = false;
+      s.exec('nmap -p80 203.0.113.2', { print: t => out += t, done: () => done = true, clear() { } });
+      c.sim.runUntil(() => done, 20000);
+      return /80\/tcp\s+open/.test(out);
+    } },
+  ],
+});
+
+/* ============================================================= CCNA — TP 6 */
+SC.push({
+  id: 'ccna-ospf', diff: 2, title: 'Routage dynamique OSPF à deux aires', level: 'CCNA / BTS SIO SISR', duration: '1 h', cat: 'CCNA',
+  desc: 'Un siège (R1, aire 0) est relié à un site distant (R3, aire 1) via un routeur de cœur (R2, ABR). Configurez OSPF sur les trois routeurs et observez la convergence, y compris après une coupure de lien.',
+  objectives: ['Configurer OSPF (processus, réseaux, aires) sur plusieurs routeurs', 'Comprendre le rôle d\'un ABR et la notion de route inter-aire (O IA)', 'Observer la formation des voisinages (show ip ospf neighbor) et la reconvergence après une coupure'],
+  steps: [
+    'Les adresses IP sont déjà en place. Configurez OSPF : R1 (aire 0 : 10.0.12.0/30 et 10.1.1.0/24), R2 — l\'ABR — (aire 0 : 10.0.12.0/30 ; aire 1 : 10.0.23.0/30), R3 (aire 1 : 10.0.23.0/30 et 10.1.3.0/24).',
+    'Vérifiez les voisinages : <code>show ip ospf neighbor</code> (état attendu : FULL) sur chaque routeur.',
+    'Sur R1, <code>show ip route</code> : repérez la route vers 10.1.3.0/24, de type <code>O IA</code> (inter-aire), apprise via R2.',
+    'Testez : <code>ping 10.1.3.10</code> depuis PC1.',
+    'Coupez le câble R2–R3, observez la disparition de la route et l\'échec du ping, puis rétablissez-le et observez la reconvergence.',
+  ],
+  build(sim) {
+    const { dev, link, get } = mk(sim);
+    dev('r-2911', 'R1', 150, 200); dev('r-2911', 'R2', 400, 200); dev('r-2911', 'R3', 650, 200);
+    dev('sw-8p', 'SW1', 150, 350); dev('sw-8p', 'SW3', 650, 350); dev('pc-linux', 'PC1', 150, 450); dev('srv-linux', 'SRV3', 650, 450);
+    link('R1', 'gi0/0', 'R2', 'gi0/0'); link('R2', 'gi0/1', 'R3', 'gi0/0');
+    link('R1', 'gi0/1', 'SW1', 'Port1'); link('PC1', 'ens33', 'SW1', 'Port2');
+    link('R3', 'gi0/1', 'SW3', 'Port1'); link('SRV3', 'ens33', 'SW3', 'Port2');
+    hostIp(get('PC1'), '10.1.1.10', '24', '10.1.1.1'); hostIp(get('SRV3'), '10.1.3.10', '24', '10.1.3.1'); get('SRV3').httpd.start();
+    cliRun(get('R1'), 'enable\nconf t\nhostname R1\ninterface gi0/0\nip address 10.0.12.1 255.255.255.252\nno shutdown\nexit\ninterface gi0/1\nip address 10.1.1.1 255.255.255.0\nno shutdown\nend');
+    cliRun(get('R2'), 'enable\nconf t\nhostname R2\ninterface gi0/0\nip address 10.0.12.2 255.255.255.252\nno shutdown\nexit\ninterface gi0/1\nip address 10.0.23.1 255.255.255.252\nno shutdown\nend');
+    cliRun(get('R3'), 'enable\nconf t\nhostname R3\ninterface gi0/0\nip address 10.0.23.2 255.255.255.252\nno shutdown\nexit\ninterface gi0/1\nip address 10.1.3.1 255.255.255.0\nno shutdown\nend');
+  },
+  solve(sim) {
+    const { get } = mk(sim);
+    cliRun(get('R1'), 'enable\nconf t\nrouter ospf 1\nrouter-id 1.1.1.1\nnetwork 10.0.12.0 0.0.0.3 area 0\nnetwork 10.1.1.0 0.0.0.255 area 0\nend');
+    cliRun(get('R2'), 'enable\nconf t\nrouter ospf 1\nrouter-id 2.2.2.2\nnetwork 10.0.12.0 0.0.0.3 area 0\nnetwork 10.0.23.0 0.0.0.3 area 1\nend');
+    cliRun(get('R3'), 'enable\nconf t\nrouter ospf 1\nrouter-id 3.3.3.3\nnetwork 10.0.23.0 0.0.0.3 area 1\nnetwork 10.1.3.0 0.0.0.255 area 1\nend');
+  },
+  checks: [
+    { label: 'PC1 (aire 0) joint SRV3 (aire 1) via OSPF', run: c => { c.wait(15000); return c.ping('PC1', '10.1.3.10'); } },
+    { label: 'R1 a appris une route inter-aire (O IA) vers 10.1.3.0/24', run: c => { const r1 = c.get('R1'); const rt = r1.lookup ? r1.lookup(IP.parse('10.1.3.10')) : null; return !!rt && rt.proto === 'O'; } },
+  ],
+});
+
+/* ============================================================= CCNA — TP 7 */
+SC.push({
+  id: 'ccna-gre', diff: 3, title: 'Interconnexion de deux sites par tunnel VPN (GRE)', level: 'CCNA / BTS SIO SISR', duration: '1 h', cat: 'CCNA',
+  desc: 'Deux sites, chacun raccordé à Internet par un accès indépendant, doivent pouvoir communiquer comme s\'ils étaient reliés directement. Construisez un tunnel GRE entre les deux routeurs de site et routez le trafic à travers.',
+  objectives: ['Comprendre le principe de l\'encapsulation (un paquet privé transporté dans un paquet public)', 'Configurer une interface Tunnel GRE (source, destination, mode)', 'Router le trafic entre deux sites via l\'interface tunnel et observer l\'encapsulation dans l\'analyseur'],
+  steps: [
+    'Les adresses publiques et privées sont déjà en place. Sur R-A : <code>interface tunnel0</code>, <code>ip address 172.16.0.1 255.255.255.252</code>, <code>tunnel source gi0/0</code>, <code>tunnel destination 198.51.100.2</code>, <code>tunnel mode gre ip</code>.',
+    'Faites de même sur R-B (destination 203.0.113.2, adresse 172.16.0.2).',
+    'Ajoutez les routes vers le LAN distant via le tunnel : sur R-A, <code>ip route 10.1.2.0 255.255.255.0 172.16.0.2</code> ; sur R-B, <code>ip route 10.1.1.0 255.255.255.0 172.16.0.1</code>.',
+    'Vérifiez <code>show interface tunnel0</code>, puis testez <code>ping 10.1.2.10</code> depuis PC-A.',
+    'Analysez la liaison R-A–ISP : une trame IP protocole 47 (GRE) doit apparaître, contenant elle-même un paquet IP privé (10.1.x.x).',
+  ],
+  build(sim) {
+    const { dev, link, get } = mk(sim);
+    dev('inet', 'ISP', 400, 100); dev('r-2911', 'R-A', 150, 250); dev('r-2911', 'R-B', 650, 250);
+    dev('sw-8p', 'SW-A', 150, 400); dev('sw-8p', 'SW-B', 650, 400); dev('pc-linux', 'PC-A', 150, 500); dev('srv-linux', 'PC-B', 650, 500);
+    link('R-A', 'gi0/0', 'ISP', 'gi0/0'); link('R-B', 'gi0/0', 'ISP', 'gi0/1');
+    link('R-A', 'gi0/1', 'SW-A', 'Port1'); link('PC-A', 'ens33', 'SW-A', 'Port2');
+    link('R-B', 'gi0/1', 'SW-B', 'Port1'); link('PC-B', 'ens33', 'SW-B', 'Port2');
+    hostIp(get('PC-A'), '10.1.1.10', '24', '10.1.1.1'); hostIp(get('PC-B'), '10.1.2.10', '24', '10.1.2.1'); get('PC-B').httpd.start();
+    cliRun(get('ISP'), 'enable\nconf t\nhostname ISP\ninterface gi0/0\nip address 203.0.113.1 255.255.255.252\nno shutdown\ninterface gi0/1\nip address 198.51.100.1 255.255.255.252\nno shutdown\nend');
+    cliRun(get('R-A'), 'enable\nconf t\nhostname R-A\ninterface gi0/0\nip address 203.0.113.2 255.255.255.252\nno shutdown\nexit\ninterface gi0/1\nip address 10.1.1.1 255.255.255.0\nno shutdown\nexit\nip route 0.0.0.0 0.0.0.0 203.0.113.1\nend');
+    cliRun(get('R-B'), 'enable\nconf t\nhostname R-B\ninterface gi0/0\nip address 198.51.100.2 255.255.255.252\nno shutdown\nexit\ninterface gi0/1\nip address 10.1.2.1 255.255.255.0\nno shutdown\nexit\nip route 0.0.0.0 0.0.0.0 198.51.100.1\nend');
+  },
+  solve(sim) {
+    const { get } = mk(sim);
+    cliRun(get('R-A'), 'enable\nconf t\ninterface tunnel0\nip address 172.16.0.1 255.255.255.252\ntunnel source gi0/0\ntunnel destination 198.51.100.2\ntunnel mode gre ip\nexit\nip route 10.1.2.0 255.255.255.0 172.16.0.2\nend');
+    cliRun(get('R-B'), 'enable\nconf t\ninterface tunnel0\nip address 172.16.0.2 255.255.255.252\ntunnel source gi0/0\ntunnel destination 203.0.113.2\ntunnel mode gre ip\nexit\nip route 10.1.1.0 255.255.255.0 172.16.0.1\nend');
+  },
+  checks: [
+    { label: 'PC-A joint PC-B à travers le tunnel GRE', run: c => c.ping('PC-A', '10.1.2.10') },
+    { label: 'Le trafic est bien encapsulé en GRE (protocole IP 47) sur la liaison Internet', run: c => c.sim.captures.some(r => { try { const p = NS.Codec.parse(r.bytes); return p.ip && p.ip.proto === 47 && p.gre && p.gre.inner; } catch (e) { return false; } }) },
+  ],
+});
+
 /* ================================================================== matrice de couverture */
 NS.COVERAGE = {
   note: 'Thèmes techniques d\'usage courant dans les formations. Le rattachement aux blocs/compétences officiels est indicatif : à confronter au référentiel officiel de votre section.',
