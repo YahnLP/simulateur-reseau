@@ -326,15 +326,27 @@ class Firewall extends IPNode {
   }
   serialize() {
     const b = super.serialize();
-    b.fw = { ifaces: this.ifaceList().map(i => ({ name: i.name, ip: i.ip && !i.dhcpLeased ? IP.str(i.ip) : '', mask: i.mask && !i.dhcpLeased ? IP.str(i.mask) : '', dhcp: !!i.dhcp, zone: i.zone, up: i.adminUp })), rules: this.rules, natMasq: this.natMasq, forwards: this.forwards, wanPing: this.wanPing, dhcpd: { enabled: this.dhcpd.enabled, pools: this.dhcpd.pools, excluded: this.dhcpd.excluded } };
+    b.fw = {
+      ifaces: this.ifaceList().map(i => ({ name: i.name, ip: i.ip && !i.dhcpLeased ? IP.str(i.ip) : '', mask: i.mask && !i.dhcpLeased ? IP.str(i.mask) : '', dhcp: !!i.dhcp, zone: i.zone, up: i.adminUp, nat: i.nat || null })),
+      rules: this.rules, natMasq: this.natMasq, forwards: this.forwards, wanPing: this.wanPing,
+      // routes statiques (ex. route par défaut vers le FAI) : sans ceci, toute route non
+      // directement connectée configurée sur le pare-feu est perdue à l'enregistrement.
+      statics: this.statics.map(s => ({ net: IP.str(s.net), mask: IP.str(s.mask), nh: s.nh ? IP.str(s.nh) : '', iface: s.iface || null, ad: s.ad || 1 })),
+      dhcpd: { enabled: this.dhcpd.enabled, pools: this.dhcpd.pools, excluded: this.dhcpd.excluded },
+    };
     return b;
   }
   restore(b) {
     const f = b.fw; if (!f) return;
     f.ifaces.forEach(c => { const i = this.ifaceByName(c.name); if (!i) return; i.zone = c.zone; i.adminUp = c.up !== false; if (c.dhcp) this.enableDhcp(i, true); else { this.enableDhcp(i, false); i.ip = c.ip ? IP.parse(c.ip) : 0; i.mask = c.mask ? IP.parseMask(c.mask) : 0; } });
     this.rules = f.rules || []; this.natMasq = f.natMasq || []; this.forwards = f.forwards || []; this.wanPing = !!f.wanPing;
+    this.statics = (f.statics || []).map(s => ({ net: s.net ? IP.parse(s.net) : 0, mask: s.mask ? IP.parseMask(s.mask) : 0, nh: s.nh ? IP.parse(s.nh) : 0, iface: s.iface || null, ad: s.ad || 1 }));
     if (f.dhcpd) { this.dhcpd.enabled = f.dhcpd.enabled; this.dhcpd.pools = f.dhcpd.pools || []; this.dhcpd.excluded = f.dhcpd.excluded || []; }
     this.rebuildNat();
+    // rebuildNat() ne connaît que natMasq/forwards ; on réapplique par-dessus le marquage NAT
+    // explicite des interfaces (ex. DMZ laissée "inside" sans masquerade dynamique propre),
+    // désormais persisté, pour ne pas perdre une politique NAT affinée à la main.
+    f.ifaces.forEach(c => { if (!c.nat) return; const i = this.ifaceByName(c.name); if (i && !i.nat) i.nat = c.nat; });
   }
 }
 
