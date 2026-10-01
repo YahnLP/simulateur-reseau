@@ -51,6 +51,20 @@ details summary{cursor:pointer;font-weight:600;padding:4px 2px;color:#334155}
 .link circle{stroke:#fff;stroke-width:1.4;pointer-events:none}
 .rubber{stroke:var(--brand);stroke-width:2;stroke-dasharray:5 4;pointer-events:none}
 .pkt{stroke:#fff;stroke-width:1;pointer-events:none;filter:drop-shadow(0 0 2px #0005)}
+
+/* ---- Mode vidéoprojecteur : préférence d'affichage locale, agrandit textes/traits/trames pour la projection en classe ---- */
+body.projector{font-size:16px}
+body.projector .node .nm{font-size:16px}
+body.projector .node .ipl{font-size:13px}
+body.projector .link .wire{stroke-width:3.4}
+body.projector .link .wire.wifi{stroke-width:3.6}
+body.projector .link.sel .wire{stroke-width:4.6}
+body.projector .link text{font-size:13px;stroke-width:4px}
+body.projector .pkt{stroke-width:1.6}
+body.projector .term{font-size:17px}
+body.projector .tbl{font-size:15px}
+body.projector .grp label,body.projector .small,body.projector .chip,body.projector .fmsg,body.projector .status{font-size:14px}
+body.projector .lic-box,body.projector .tp .legal{font-size:14px}
 /* ---- dock ---- */
 #dock{height:42vh;min-height:300px;background:var(--panel);border-top:1px solid var(--line);display:flex;flex-direction:column;min-height:30px;position:relative}
 #dockgrip{position:absolute;top:-4px;left:0;right:0;height:8px;cursor:ns-resize;z-index:3}

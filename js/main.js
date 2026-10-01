@@ -15,7 +15,14 @@ $$('.tool').forEach(b => b.addEventListener('click', () => app.setTool(b.dataset
 
 /* ------------------------------------------------ simulation */
 const spd = $('#speed');
-const setSpeed = () => { app.speed = 0.5 * Math.pow(100, spd.value / 100); $('#speedv').textContent = '×' + (app.speed < 10 ? app.speed.toFixed(1).replace('.0', '') : Math.round(app.speed)); };
+/* Échelle en deux segments exponentiels (×0,2 → ×5 → ×50) : le curseur central (valeur 50) reste à ×5,
+   tout en abaissant le plancher à ×0,2 pour bien suivre les trames à l'œil. */
+const SPD_FLOOR = 0.2, SPD_MID = 5, SPD_CEIL = 50;
+const setSpeed = () => {
+  const v = spd.value;
+  app.speed = v <= 50 ? SPD_FLOOR * Math.pow(SPD_MID / SPD_FLOOR, v / 50) : SPD_MID * Math.pow(SPD_CEIL / SPD_MID, (v - 50) / 50);
+  $('#speedv').textContent = '×' + (app.speed < 10 ? app.speed.toFixed(1).replace('.0', '') : Math.round(app.speed));
+};
 spd.value = 50; spd.addEventListener('input', setSpeed); setSpeed();
 $('#btn-run').addEventListener('click', () => app.toggleRun());
 $('#btn-step').addEventListener('click', () => { if (app.running) app.toggleRun(); if (!sim.stepFrame()) ui.toast('Plus aucune trame en attente', 'info'); });
@@ -23,6 +30,12 @@ $('#btn-t1').addEventListener('click', () => { sim.runFor(60000); ui.toast('Temp
 $('#opt-strict').addEventListener('change', e => { sim.opts.strictCables = e.target.checked; sim.refreshCables(); app.refresh(); });
 $('#opt-stp').addEventListener('change', e => { sim.opts.stpFast = e.target.checked; ui.toast('STP ' + (e.target.checked ? 'rapide (2 s)' : 'standard (15 s)') + ' — appliqué aux prochaines transitions', 'info'); });
 $('#opt-ports').addEventListener('change', e => { app.showPorts = e.target.checked; app.dirtyTopo = true; });
+/* Mode vidéoprojecteur : préférence d'affichage locale (salle/poste), indépendante du plan — stockée à part,
+   hors de l'autosave/du JSON de topologie, et sans effet sur la simulation elle-même. */
+const LS_PROJECTOR = 'simreseau.projector';
+const applyProjector = on => { document.body.classList.toggle('projector', on); app.projector = on; app.dirtyTopo = true; };
+(() => { const on = localStorage.getItem(LS_PROJECTOR) === '1'; $('#opt-projector').checked = on; applyProjector(on); })();
+$('#opt-projector').addEventListener('change', e => { const on = e.target.checked; applyProjector(on); try { localStorage.setItem(LS_PROJECTOR, on ? '1' : '0'); } catch (e) { } });
 $('#btn-fit').addEventListener('click', () => app.fit());
 $('#halt-ok').addEventListener('click', () => app.clearHalt());
 

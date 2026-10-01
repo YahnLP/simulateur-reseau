@@ -252,8 +252,10 @@ class App {
       if (p < 0) { keep.push(f); return; }
       const l = f.link; if (!l._pa) { keep.push(f); return; }
       const A = f.from === l.a ? l._pa : l._pb, B = f.from === l.a ? l._pb : l._pa;
-      if (!f.el) { f.el = h('svg:rect', { class: 'pkt', width: 12, height: 8, rx: 2, fill: f.color }); this.gFx.appendChild(f.el); }
-      f.el.setAttribute('x', A.x + (B.x - A.x) * p - 6); f.el.setAttribute('y', A.y + (B.y - A.y) * p - 4); keep.push(f);
+      const pw = this.projector ? 20 : 12, ph = this.projector ? 13 : 8;
+      if (!f.el) { f.el = h('svg:rect', { class: 'pkt', width: pw, height: ph, rx: 2, fill: f.color }); this.gFx.appendChild(f.el); }
+      else { f.el.setAttribute('width', pw); f.el.setAttribute('height', ph); }
+      f.el.setAttribute('x', A.x + (B.x - A.x) * p - pw / 2); f.el.setAttribute('y', A.y + (B.y - A.y) * p - ph / 2); keep.push(f);
     });
     this.fx = keep;
   }

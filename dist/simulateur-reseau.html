@@ -61,6 +61,20 @@ details summary{cursor:pointer;font-weight:600;padding:4px 2px;color:#334155}
 .link circle{stroke:#fff;stroke-width:1.4;pointer-events:none}
 .rubber{stroke:var(--brand);stroke-width:2;stroke-dasharray:5 4;pointer-events:none}
 .pkt{stroke:#fff;stroke-width:1;pointer-events:none;filter:drop-shadow(0 0 2px #0005)}
+
+/* ---- Mode vidéoprojecteur : préférence d'affichage locale, agrandit textes/traits/trames pour la projection en classe ---- */
+body.projector{font-size:16px}
+body.projector .node .nm{font-size:16px}
+body.projector .node .ipl{font-size:13px}
+body.projector .link .wire{stroke-width:3.4}
+body.projector .link .wire.wifi{stroke-width:3.6}
+body.projector .link.sel .wire{stroke-width:4.6}
+body.projector .link text{font-size:13px;stroke-width:4px}
+body.projector .pkt{stroke-width:1.6}
+body.projector .term{font-size:17px}
+body.projector .tbl{font-size:15px}
+body.projector .grp label,body.projector .small,body.projector .chip,body.projector .fmsg,body.projector .status{font-size:14px}
+body.projector .lic-box,body.projector .tp .legal{font-size:14px}
 /* ---- dock ---- */
 #dock{height:42vh;min-height:300px;background:var(--panel);border-top:1px solid var(--line);display:flex;flex-direction:column;min-height:30px;position:relative}
 #dockgrip{position:absolute;top:-4px;left:0;right:0;height:8px;cursor:ns-resize;z-index:3}
@@ -172,6 +186,7 @@ details.lic-more{margin-top:8px}details.lic-more summary{cursor:pointer;color:va
     <label title="Si coché, un câble droit/croisé inadapté empêche le lien de monter (sinon Auto-MDIX)"><input type="checkbox" id="opt-strict"> Câbles stricts</label>
     <label title="Accélère la convergence STP (2 s au lieu de 15 s)"><input type="checkbox" id="opt-stp" checked> STP rapide</label>
     <label title="Afficher les noms de ports sur les liens"><input type="checkbox" id="opt-ports" checked> Ports</label>
+    <label title="Agrandit les textes, les câbles et l'animation des trames pour une projection en classe (préférence locale, non enregistrée dans le plan)"><input type="checkbox" id="opt-projector"> Vidéoprojecteur</label>
     <button id="btn-fit" title="Recentrer la vue">⌖</button>
     <button id="btn-help" title="Aide et couverture du programme">? Aide</button>
   </div>
@@ -11010,8 +11025,10 @@ class App {
       if (p < 0) { keep.push(f); return; }
       const l = f.link; if (!l._pa) { keep.push(f); return; }
       const A = f.from === l.a ? l._pa : l._pb, B = f.from === l.a ? l._pb : l._pa;
-      if (!f.el) { f.el = h('svg:rect', { class: 'pkt', width: 12, height: 8, rx: 2, fill: f.color }); this.gFx.appendChild(f.el); }
-      f.el.setAttribute('x', A.x + (B.x - A.x) * p - 6); f.el.setAttribute('y', A.y + (B.y - A.y) * p - 4); keep.push(f);
+      const pw = this.projector ? 20 : 12, ph = this.projector ? 13 : 8;
+      if (!f.el) { f.el = h('svg:rect', { class: 'pkt', width: pw, height: ph, rx: 2, fill: f.color }); this.gFx.appendChild(f.el); }
+      else { f.el.setAttribute('width', pw); f.el.setAttribute('height', ph); }
+      f.el.setAttribute('x', A.x + (B.x - A.x) * p - pw / 2); f.el.setAttribute('y', A.y + (B.y - A.y) * p - ph / 2); keep.push(f);
     });
     this.fx = keep;
   }
@@ -12290,7 +12307,14 @@ $$('.tool').forEach(b => b.addEventListener('click', () => app.setTool(b.dataset
 
 /* ------------------------------------------------ simulation */
 const spd = $('#speed');
-const setSpeed = () => { app.speed = 0.5 * Math.pow(100, spd.value / 100); $('#speedv').textContent = '×' + (app.speed < 10 ? app.speed.toFixed(1).replace('.0', '') : Math.round(app.speed)); };
+/* Échelle en deux segments exponentiels (×0,2 → ×5 → ×50) : le curseur central (valeur 50) reste à ×5,
+   tout en abaissant le plancher à ×0,2 pour bien suivre les trames à l'œil. */
+const SPD_FLOOR = 0.2, SPD_MID = 5, SPD_CEIL = 50;
+const setSpeed = () => {
+  const v = spd.value;
+  app.speed = v <= 50 ? SPD_FLOOR * Math.pow(SPD_MID / SPD_FLOOR, v / 50) : SPD_MID * Math.pow(SPD_CEIL / SPD_MID, (v - 50) / 50);
+  $('#speedv').textContent = '×' + (app.speed < 10 ? app.speed.toFixed(1).replace('.0', '') : Math.round(app.speed));
+};
 spd.value = 50; spd.addEventListener('input', setSpeed); setSpeed();
 $('#btn-run').addEventListener('click', () => app.toggleRun());
 $('#btn-step').addEventListener('click', () => { if (app.running) app.toggleRun(); if (!sim.stepFrame()) ui.toast('Plus aucune trame en attente', 'info'); });
@@ -12298,6 +12322,12 @@ $('#btn-t1').addEventListener('click', () => { sim.runFor(60000); ui.toast('Temp
 $('#opt-strict').addEventListener('change', e => { sim.opts.strictCables = e.target.checked; sim.refreshCables(); app.refresh(); });
 $('#opt-stp').addEventListener('change', e => { sim.opts.stpFast = e.target.checked; ui.toast('STP ' + (e.target.checked ? 'rapide (2 s)' : 'standard (15 s)') + ' — appliqué aux prochaines transitions', 'info'); });
 $('#opt-ports').addEventListener('change', e => { app.showPorts = e.target.checked; app.dirtyTopo = true; });
+/* Mode vidéoprojecteur : préférence d'affichage locale (salle/poste), indépendante du plan — stockée à part,
+   hors de l'autosave/du JSON de topologie, et sans effet sur la simulation elle-même. */
+const LS_PROJECTOR = 'simreseau.projector';
+const applyProjector = on => { document.body.classList.toggle('projector', on); app.projector = on; app.dirtyTopo = true; };
+(() => { const on = localStorage.getItem(LS_PROJECTOR) === '1'; $('#opt-projector').checked = on; applyProjector(on); })();
+$('#opt-projector').addEventListener('change', e => { const on = e.target.checked; applyProjector(on); try { localStorage.setItem(LS_PROJECTOR, on ? '1' : '0'); } catch (e) { } });
 $('#btn-fit').addEventListener('click', () => app.fit());
 $('#halt-ok').addEventListener('click', () => app.clearHalt());
 
