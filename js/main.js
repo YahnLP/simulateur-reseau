@@ -66,6 +66,12 @@ function loadData(d, quiet) {
 function closeAllDev() { ui.closeAllWindows(); sim.devices.forEach(d => { d._sess = null; d._termApi = null; d._termBanner = false; }); }
 function resetAll() { closeAllDev(); NS.clearTopology(sim); app.sel = null; app.tpCurrent = null; renderTp(); app.clearHalt(); app.refresh(); if (app.analyzer) { app.analyzer.clear(); app.analyzer.fillLinks(); } }
 $('#btn-new').addEventListener('click', () => { const go = () => { resetAll(); app.fit(); autosave(); }; if (sim.devices.size) ui.confirmBox('Nouveau plan', 'Effacer le plan actuel ? (le plan courant est déjà sauvegardé automatiquement dans ce navigateur, mais pas exporté)', go); else go(); });
+$('#btn-raz').addEventListener('click', () => {
+  if (!sim.devices.size) return;
+  ui.confirmBox('RAZ réseau', 'Vider les tables ARP et MAC, les baux DHCP, les sessions NAT/pare-feu/RADIUS/VPN/802.1X et relancer la convergence STP/RIP/OSPF — comme si le réseau venait d\'être mis sous tension. La configuration (adresses, VLAN, ACL, règles, comptes…) n\'est pas modifiée. Continuer ?', () => {
+    NS.softReset(sim); app.refresh(); if (app.analyzer) { app.analyzer.clear(); app.analyzer.fillLinks(); } ui.toast('État appris réinitialisé', 'ok');
+  });
+});
 let saveHandle = null;
 async function saveAs(forcePicker) {
   const data = JSON.stringify(snapshot(), null, 1);

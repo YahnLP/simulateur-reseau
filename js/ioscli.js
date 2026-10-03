@@ -780,9 +780,16 @@ cmd('if', 'switchport port-security violation <x>', (s, a) => s.items().forEach(
 cmd('if', 'switchport port-security mac-address sticky [<m>]', (s, a) => s.items().forEach(it => { if (it.port) { it.port.sec.sticky = true; if (a.m) { const m = MAC.parseAny(a.m); if (m) it.port.sec.macs.add(m); } } }));
 cmd('if', 'switchport port-security mac-address <m>', (s, a) => s.items().forEach(it => { const m = MAC.parseAny(a.m); if (it.port && m) it.port.sec.macs.add(m); }));
 cmd('if', 'switchport <x...>', () => { });
-cmd('if', 'spanning-tree portfast <x...>', (s, a) => s.items().forEach(it => { if (it.port) { it.port.portfast = true; s.dev.stp.enabled && s.dev.stp.recompute(); } }));
+cmd('if', 'spanning-tree portfast <x...>', (s, a) => s.items().forEach(it => { if (it.port) { it.port.portfast = true; if (/bpduguard/.test(a.x)) it.port.bpduGuard = !/disable/.test(a.x); s.dev.stp.enabled && s.dev.stp.recompute(); } }));
 cmd('if', 'spanning-tree portfast', (s, a) => s.items().forEach(it => { if (it.port) { it.port.portfast = true; s.dev.stp.enabled && s.dev.stp.recompute(); } }));
 cmd('if', 'no spanning-tree portfast', s => s.items().forEach(it => { if (it.port) it.port.portfast = false; }));
+cmd('if', 'spanning-tree bpduguard enable', s => s.items().forEach(it => { if (it.port) it.port.bpduGuard = true; }));
+cmd('if', 'spanning-tree bpduguard disable', s => s.items().forEach(it => { if (it.port) it.port.bpduGuard = false; }));
+cmd('if', 'no spanning-tree bpduguard', s => s.items().forEach(it => { if (it.port) delete it.port.bpduGuard; }));
+cmd('config', 'spanning-tree portfast bpduguard default', s => { s.dev.stp.gBpduGuard = true; });
+cmd('config', 'no spanning-tree portfast bpduguard default', s => { s.dev.stp.gBpduGuard = false; });
+cmd('config', 'spanning-tree portfast default', s => { s.dev.stp.gPortfast = true; });
+cmd('config', 'no spanning-tree portfast default', s => { s.dev.stp.gPortfast = false; });
 cmd('if', 'spanning-tree <x...>', () => { });
 
 /* ---- ACL ---- */

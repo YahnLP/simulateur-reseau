@@ -23,6 +23,7 @@
     <button id="btn-step" title="Avancer jusqu'à la prochaine trame reçue (en pause)">⏭ Trame</button>
     <label class="spd" title="Vitesse de la simulation">Vitesse <input id="speed" type="range" min="0" max="100" value="50" aria-label="Vitesse"><output id="speedv">×4</output></label>
     <button id="btn-t1" title="Avancer le temps simulé d'une minute (expiration ARP/MAC, baux…)">+1 min</button>
+    <button id="btn-raz" title="Vider ce que les équipements ont appris en marchant (ARP, tables MAC, baux DHCP, convergence STP/RIP/OSPF, sessions NAT/pare-feu/RADIUS/VPN/802.1X) pour retrouver l'état d'un réseau qui vient d'être allumé — sans toucher à la configuration en place">RAZ réseau</button>
     <span id="simtime" class="mono" aria-live="off">t = 0.000 s</span>
   </div>
   <div class="grp opts" role="group" aria-label="Options">

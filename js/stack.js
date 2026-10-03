@@ -555,5 +555,42 @@ class IPNode extends Device {
   natClear() { this.nat.table = this.nat.table.filter(e => e.static); }
 }
 
+/* ================================================================== RAZ TP (réinitialisation de l'état appris) */
+/* Remet l'état "appris en fonctionnement" à zéro — comme si toute la maquette venait d'être mise sous
+   tension et que plus personne ne se connaît encore (tables ARP/MAC vides, baux DHCP repartant de zéro,
+   convergence STP/RIP/OSPF à refaire, sessions NAT/pare-feu/RADIUS/VPN/802.1X relancées) — sans toucher
+   à ce qu'un élève ou un scénario a déposé comme configuration (adresses IP, VLAN, ACL, règles de
+   pare-feu, comptes et clés RADIUS/Wi-Fi/802.1X, routes statiques, etc.). */
+NS.softReset = function (sim) {
+  sim.devices.forEach(d => {
+    if (d.arpTable) d.arpTable.clear();
+    if (d.arpPending) d.arpPending.clear();
+    if (d.ip6 && d.ip6.flushIface) d.ifaceList().forEach(i => d.ip6.flushIface(i));
+    if (d.dhcpClients) d.dhcpClients.forEach((c, name) => { const i = d.ifaceByName(name); if (i && i.dhcp) c.start(); });
+    if (d.dhcpd) d.dhcpd.leases.clear();
+    if (d.rip && d.rip.enabled) { d.rip.stop(); d.rip.start(); }
+    if (d.ospf && d.ospf.enabled) d.ospf.restart();
+    if (d.dynRoutes) d.dynRoutes = d.dynRoutes.filter(r => r.proto !== 'R' && r.proto !== 'O' && !r.dhcp);
+    if (d.natClear) d.natClear();
+    if (d.sessions) d.sessions.clear();
+    if (d.radius) {
+      (d.radius.servers || []).forEach(s => { s.stats = { sent: 0, accept: 0, reject: 0, challenge: 0, timeouts: 0, badAuth: 0, retrans: 0 }; s.dead = 0; });
+      if (d.radius.pend) d.radius.pend.length = 0;
+      if (d.radius.srv) { d.radius.srv.log = []; d.radius.srv.acct = []; d.radius.srv.sessions && d.radius.srv.sessions.clear(); }
+    }
+    if (d.vpn) { d.vpn.clearSa && d.vpn.clearSa(); d.vpn.clearIsakmp && d.vpn.clearIsakmp(); if (d.vpn.trig) d.vpn.trig.clear(); }
+    if (d.dot1x && d.dot1x.sup && d.dot1x.sup.state !== undefined) { const s = d.dot1x.sup; s.state = s.enabled ? 'connecting' : 'disabled'; s.log = []; s.phase = null; s.app = 0; s.frag = 0; s.id = 0; if (s.enabled) d.dot1x.supStart(); }
+    if (d.macTable) d.macTable.clear();
+    if (d.stp && d.managed && d.stp.enabled) { d.stp.disable(); d.stp.enable(); }
+    (d.ports || []).forEach(p => {
+      if (p.sec && p.sec.enabled && !p.sec.sticky) { p.sec.macs.clear(); p.sec.violations = 0; }
+      if (p.errdis) { p.errdis = false; p.errdisReason = ''; sim.portChanged(p); }
+      if (p.lag && p.lag.mode !== 'on') { p.lag.partner = null; p.lag.bundled = false; p.lag.lastTx = -1e9; if (p.up && d.lagSend) d.lagSend(p); }
+    });
+    if (d.dot1x && d.managed) (d.ports || []).forEach(p => { if (p.dx) d.dot1x.clearSessions(p); });
+  });
+  sim.captures.length = 0;
+};
+
 NS.Device = Device; NS.Iface = Iface; NS.IPNode = IPNode; NS.TcpConn = TcpConn;
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -258,7 +258,7 @@ SC.push({
 /* ================================================================== TP 8 */
 SC.push({
   id: 'dmz', type: 'decouverte', diff: 2, title: 'Pare-feu, DMZ et redirection de port (Stormshield SN210)', level: 'BTS SIO SISR / Bac Pro CIEL', duration: '1 h 30',
-  desc: 'Un pare-feu à trois zones (LAN, DMZ, WAN) : politique de filtrage, masquerade et publication d\'un serveur web de la DMZ vers Internet.',
+  desc: 'Un pare-feu à trois zones (LAN, DMZ, WAN) : politique de filtrage, masquerade et publication d\'un serveur web de la DMZ vers Internet. <i>Remarque sur le schéma : <b>CLIENT</b> n\'est pas un poste « derrière une box », c\'est un hôte quelconque sur Internet qui sert à tester la publication depuis l\'extérieur ; le nœud <b>FAI</b> représente Internet dans son ensemble, pas une box d\'abonné.</i>',
   objectives: ['Définir des zones et une politique de filtrage ordonnée', 'Publier un service (redirection de port + règle WAN→DMZ)', 'Vérifier le filtrage à états et lire le journal du pare-fu'],
   steps: [
     'Ouvrez <b>FW1</b> (double-clic) : onglet <b>Interfaces</b>. OUT (WAN) <code>203.0.113.2/30</code>, passerelle <code>203.0.113.1</code> ; IN (LAN) <code>192.168.1.254/24</code> ; DMZ1 <code>172.16.0.254/24</code>.',
@@ -737,7 +737,7 @@ SC.push({
 /* ============================================================= Stormshield — TP 1 */
 SC.push({
   id: 'ss-politique', type: 'probleme', diff: 2, title: 'Politique de filtrage Stormshield : moindre privilège', level: 'Habilitation Stormshield (CSNA) / BTS SIO', duration: '1 h', cat: 'Stormshield',
-  desc: 'Un pare-feu Stormshield est livré avec une politique par défaut trop permissive (tout le LAN peut tout faire vers le WAN et la DMZ). Reconstruisez une politique de filtrage minimale, ordonnée, selon le principe du moindre privilège.',
+  desc: 'Un pare-feu Stormshield est livré avec une politique par défaut trop permissive (tout le LAN peut tout faire vers le WAN et la DMZ). Reconstruisez une politique de filtrage minimale, ordonnée, selon le principe du moindre privilège. <i>Remarque sur le schéma : <b>CLIENT</b> n\'est pas un poste « derrière une box », c\'est un hôte quelconque sur Internet qui sert uniquement à vérifier, depuis l\'extérieur, que le service publié est bien joignable ; le nœud <b>FAI</b> représente Internet dans son ensemble (tous les routeurs d\'opérateurs entre les deux), pas une box d\'abonné — c\'est pour ça qu\'il n\'y a pas de box FAI dans ce schéma.</i>',
   objectives: ['Comprendre l\'ordre d\'évaluation des règles et le refus implicite en fin de politique', 'Remplacer une politique permissive par des règles explicites et minimales', 'Vérifier qu\'un flux non autorisé est bien bloqué (et journalisé)'],
   steps: [
     'Ouvrez <b>FW1</b> → onglet <b>Règles de filtrage</b>. La politique actuelle autorise tout le LAN vers le WAN et vers la DMZ, et toute la DMZ vers le WAN : c\'est excessif pour un serveur qui ne doit que répondre au web.',
@@ -1059,7 +1059,7 @@ SC.push({
     cliRun(get('ISP'), 'enable\nconf t\nhostname ISP\ninterface gi0/0\nip address 203.0.113.1 255.255.255.248\nno shutdown\ninterface gi0/1\nip address 198.51.100.1 255.255.255.0\nno shutdown\nend');
     hostIp(get('AUDITEUR'), '198.51.100.2', '24', '198.51.100.1');
     const fw = get('FW1');
-    const wan = fw.ifaceByName('wan1'); wan.ip = IP.parse('203.0.113.2'); wan.mask = IP.parseMask('255.255.255.248'); wan.adminUp = true; wan.dhcp = false;
+    const wan = fw.ifaceByName('wan1'); fw.enableDhcp(wan, false); wan.ip = IP.parse('203.0.113.2'); wan.mask = IP.parseMask('255.255.255.248'); wan.adminUp = true;
     const lan = fw.ifaceByName('internal1'); lan.ip = IP.parse('192.168.10.1'); lan.mask = IP.parseMask('255.255.255.0'); lan.adminUp = true;
     const dmz = fw.ifaceByName('dmz'); dmz.ip = IP.parse('172.16.0.1'); dmz.mask = IP.parseMask('255.255.255.0'); dmz.adminUp = true;
     fw.statics.push({ net: 0, mask: 0, nh: IP.parse('203.0.113.1'), iface: 'wan1', ad: 1 });
@@ -1375,6 +1375,81 @@ SC.push({
   ],
 });
 
+/* ================================================================== TP box / double NAT */
+SC.push({
+  id: 'box-doublenat', type: 'decouverte', diff: 2, title: 'La box Internet : DHCP et NAT côté client, et le piège du double NAT', level: 'Bac Pro CIEL / BTS SIO SISR', duration: '1 h',
+  desc: 'Une box fait pour son réseau ce qu\'un routeur, un serveur DHCP et un pare-feu NAT font séparément en entreprise — mais sans qu\'on ait rien à configurer. Ici, une seconde box a été branchée en cascade derrière la première (un salarié qui ajoute « sa » box pour avoir plus de prises, par exemple) : vous allez observer ce que la box fait réellement, puis ce que ce double NAT empêche de faire.',
+  objectives: ['Observer qu\'une box obtient elle-même une adresse auprès du FAI et fait du NAT, sans aucune configuration', 'Lire dans l\'analyseur la traduction d\'adresse (NAT) entre le réseau privé et l\'adresse obtenue par la box', 'Comprendre pourquoi empiler deux box (double NAT) empêche de publier un service, sans qu\'aucune panne ne soit « cachée »'],
+  steps: [
+    'PC1 est câblé derrière <b>BOX1</b> seule. Sur PC1 : <code>ipconfig</code> — quelle adresse, quelle passerelle ? Ouvrez <b>BOX1</b> (double-clic) : comparez l\'adresse LAN affichée avec celle de PC1, et notez l\'adresse WAN obtenue : d\'où vient-elle, alors que personne ne l\'a configurée sur BOX1 ?',
+    'Analyseur sur le câble PC1–BOX1, puis sur le câble BOX1–FAI : lancez un ping de PC1 vers l\'adresse de FAI (<code>203.0.113.1</code>) et comparez l\'adresse IP source du paquet ICMP des deux côtés de la box. Que s\'est-il passé ? C\'est la box qui a fait ce travail, pas vous.',
+    '<b>BOX2</b> est branchée en cascade : son port WAN est câblé sur un port LAN de BOX1 (c\'est ce qu\'on fait, par erreur ou par confort, en branchant « sa propre box » derrière celle de l\'entreprise ou du FAI). PC2 est câblé derrière BOX2. Ouvrez BOX2 : quelle adresse a-t-elle obtenue sur son WAN ? De qui ? Remarquez que le réseau LAN de BOX2 (<code>192.168.2.0/24</code>) a volontairement été changé ici — par défaut, une box neuve utilise presque toujours <code>192.168.1.0/24</code>, exactement comme BOX1 : empiler deux box avec le même réseau par défaut est l\'une des causes de panne les plus fréquentes à vérifier en premier.',
+    'Testez : PC2 arrive-t-il tout de même à joindre FAI (<code>203.0.113.1</code>) ? Combien de traductions NAT successives ce flux traverse-t-il pour sortir (comptez les box traversées) ?',
+    'Un petit site web tourne sur PC2. Depuis <b>CLIENT</b> (sur Internet), essayez d\'y accéder via l\'adresse publique obtenue par BOX1 (celle que vous avez relevée à l\'étape 1). Ça ne fonctionne pas : à quel niveau, exactement, la requête s\'arrête-t-elle (sur BOX1 ? sur BOX2 ? nulle part, en fait) ? Qu\'aurait-il fallu configurer, et sur combien d\'équipements, pour que ça fonctionne — et pourquoi certaines box grand public ne permettent même pas de le faire dans ce cas précis ?',
+  ],
+  build(sim) {
+    const { dev, link, get } = mk(sim);
+    dev('inet', 'FAI', 860, 220); dev('pc-linux', 'CLIENT', 1080, 220);
+    dev('box', 'BOX1', 600, 220); dev('pc-win', 'PC1', 380, 100);
+    dev('box', 'BOX2', 380, 340); dev('pc-win', 'PC2', 160, 340);
+    link('FAI', 'gi0/1', 'CLIENT', 'ens33');
+    link('BOX1', 'wan', 'FAI', 'gi0/0');
+    link('PC1', 'eth0', 'BOX1', 'lan1');
+    link('BOX2', 'wan', 'BOX1', 'lan2');
+    link('PC2', 'eth0', 'BOX2', 'lan1');
+    cliRun(get('FAI'), 'enable\nconf t\ninterface gi0/0\nip address 203.0.113.1 255.255.255.248\nno shutdown\nexit\ninterface gi0/1\nip address 198.51.100.1 255.255.255.0\nno shutdown\nexit\nip dhcp pool WANPUB\nnetwork 203.0.113.0 255.255.255.248\ndefault-router 203.0.113.1\nend');
+    hostIp(get('CLIENT'), '198.51.100.20', '24', '198.51.100.1');
+    hostDhcp(get('PC1')); hostDhcp(get('PC2'));
+    /* BOX2 est une box neuve : sans intervention, son LAN par défaut serait 192.168.1.0/24 — identique à
+       celui de BOX1, ce qui créerait un vrai conflit d'adressage sur BOX2 elle-même (deux interfaces sur
+       le même réseau). On lui donne ici un réseau différent pour pouvoir observer le double NAT sans que
+       ce conflit, lui, ne vienne brouiller l'observation ; le texte du TP attire l'attention sur ce point. */
+    const b2 = get('BOX2'); const l2 = b2.ifaces.get('Vlan1'); l2.ip = IP.parse('192.168.2.1'); l2.mask = IP.parseMask('24');
+    const pool2 = b2.dhcpd.pools[0]; pool2.net = IP.parse('192.168.2.0'); pool2.mask = IP.parseMask('24'); pool2.router = l2.ip; pool2.dns = [l2.ip]; pool2.start = IP.parse('192.168.2.10'); pool2.end = IP.parse('192.168.2.100');
+    const p2 = get('PC2'); p2.httpd.start();
+    p2.httpd.pages['/'] = { type: 'text/html; charset=utf-8', body: '<html><head><title>PC2</title></head><body><h1>Petit site sur PC2</h1></body></html>', _custom: true };
+  },
+  solve: null,
+  checks: [
+    { label: 'PC1 (derrière une seule box) obtient une adresse privée de BOX1', run: c => { c.wait(6000); return /^192\.168\.1\./.test(c.ipOf('PC1')); } },
+    { label: 'BOX1 obtient automatiquement une adresse « publique » simulée auprès du FAI, par DHCP', run: c => { c.wait(6000); return IP.inNet(c.get('BOX1').ifaceByName('wan').ip, IP.parse('203.0.113.0'), IP.parseMask('29')); } },
+    { label: 'PC1 (NAT simple) peut joindre le FAI', run: c => c.ping('PC1', '203.0.113.1') },
+    { label: 'PC2, derrière BOX2 (double NAT), obtient aussi une adresse privée — d\'un autre réseau que PC1', run: c => { c.wait(6000); return /^192\.168\.2\./.test(c.ipOf('PC2')); } },
+    { label: 'PC2 arrive tout de même à joindre le FAI en sortant (le double NAT ne bloque pas le trafic sortant)', run: c => c.ping('PC2', '203.0.113.1') },
+    { label: 'Le client Internet ne peut pas joindre le site de PC2 sans redirection de port configurée sur les deux box', run: c => { const pub = IP.str(c.get('BOX1').ifaceByName('wan').ip); return !c.http('CLIENT', 'http://' + pub); } },
+  ],
+});
+
+/* ================================================================== TP cybersécurité : commutateur intrus / BPDU Guard */
+SC.push({
+  id: 'cyber-bpduguard', type: 'decouverte', diff: 2, title: 'Commutateur intrus et tempête de diffusion : durcir les ports utilisateur (BPDU Guard)', level: 'BTS SIO — Cybersécurité', duration: '45 min', cat: 'Cybersécurité',
+  desc: 'Toute prise réseau accessible à quelqu\'un qui n\'est pas du service informatique est un point d\'entrée : il suffit d\'y brancher un petit commutateur personnel (ou, pire, un câble en boucle sur ce commutateur) pour, selon les cas, se raccorder discrètement au réseau de l\'entreprise ou y déclencher une tempête de diffusion — exactement le phénomène observé dans le TP sur le Spanning Tree, mais ici provoqué délibérément depuis un port utilisateur. Vous allez constater qu\'un port d\'accès ordinaire ne voit rien venir, puis le durcir avec la contre-mesure standard.',
+  objectives: ['Constater qu\'un port d\'accès ordinaire accepte silencieusement un commutateur branché par n\'importe qui', 'Comprendre pourquoi cela ouvre la porte à une tempête de diffusion si l\'intrus crée (volontairement ou non) une boucle derrière son propre matériel', 'Configurer PortFast + BPDU Guard sur les ports utilisateur, la contre-mesure standard qui bloque le port dès la première trame BPDU reçue'],
+  steps: [
+    'SW-ATT (avec PC-ATT derrière) est déjà branché sur le port <code>fa0/3</code> de SWCORE — c\'est le commutateur personnel d\'un « intrus ». Sur SWCORE : <code>show spanning-tree</code> puis <code>show interfaces fa0/3</code> : rien ne distingue ce port d\'un port normal. Depuis PC-ATT, pingez PC1 : ça fonctionne — l\'intrus a rejoint le réseau sans la moindre authentification.',
+    'Mesurez l\'enjeu (expérience annexe, non notée) : si, à la place d\'un simple commutateur, l\'intrus reliait deux de ses propres ports entre eux (une boucle), vous retrouveriez exactement la tempête de diffusion du TP « Boucle de commutation et Spanning Tree » — sauf que cette fois, c\'est un port d\'accès ordinaire, chez vous, qui l\'aurait permise.',
+    'Débranchez SW-ATT, puis durcissez <code>fa0/3</code> sur SWCORE : <code>switchport mode access</code>, <code>spanning-tree portfast</code>, <code>spanning-tree bpduguard enable</code>. Ce port est désormais déclaré comme un port d\'utilisateur final, qui ne doit jamais voir arriver de trame BPDU (c\'est-à-dire un autre commutateur).',
+    'Rebranchez SW-ATT sur <code>fa0/3</code> : que se passe-t-il cette fois, immédiatement ? <code>show interfaces fa0/3</code> et le journal de SWCORE vous donnent la raison exacte.',
+    'Vérifiez que PC1 et PC2, eux, n\'ont rien perdu : la contre-mesure est ciblée sur le port suspect, pas sur le reste du réseau.',
+  ],
+  build(sim) {
+    const { dev, link, get } = mk(sim);
+    dev('sw-2960', 'SWCORE', 400, 150); dev('pc-win', 'PC1', 200, 320); dev('pc-win', 'PC2', 320, 320);
+    dev('sw-2960', 'SW-ATT', 650, 320); dev('pc-win', 'PC-ATT', 820, 320);
+    link('PC1', 'eth0', 'SWCORE', 'fa0/1'); link('PC2', 'eth0', 'SWCORE', 'fa0/2');
+    link('SWCORE', 'fa0/3', 'SW-ATT', 'fa0/1'); link('PC-ATT', 'eth0', 'SW-ATT', 'fa0/2');
+    hostIp(get('PC1'), '10.0.0.1'); hostIp(get('PC2'), '10.0.0.2'); hostIp(get('PC-ATT'), '10.0.0.9');
+  },
+  solve(sim) {
+    const { get } = mk(sim);
+    cliRun(get('SWCORE'), 'enable\nconf t\ninterface fa0/3\nswitchport mode access\nspanning-tree portfast\nspanning-tree bpduguard enable\nshutdown\nno shutdown\nend');
+  },
+  checks: [
+    { label: 'Après durcissement : le port est immédiatement bloqué (BPDU Guard) dès que le commutateur intrus s\'y reconnecte', run: c => { const p = c.get('SWCORE').findPort('fa0/3'); return p.errdis === true && p.errdisReason === 'bpduguard'; } },
+    { label: 'PC1 et PC2, eux, communiquent toujours normalement', run: c => c.ping('PC1', '10.0.0.2') },
+  ],
+});
+
 /* ================================================================== matrice de couverture */
 NS.COVERAGE = {
   note: 'Thèmes techniques d\'usage courant dans les formations. Le rattachement aux blocs/compétences officiels est indicatif : à confronter au référentiel officiel de votre section.',
@@ -1388,6 +1463,7 @@ NS.COVERAGE = {
     ['VLAN, trunk 802.1Q, VLAN natif', 'BC2', 'B2', 'ok', 'vlan', 'Pas de VTP/DTP'],
     ['Routage inter-VLAN (router-on-a-stick, SVI, switch L3)', 'BC2', 'B2', 'ok', 'vlan', ''],
     ['STP (élection root, ports bloqués, BPDU), boucles', 'BC2', 'B2', 'ok', 'stp', '802.1D et Rapid-PVST (RSTP) simulés ; PVST par VLAN'],
+    ['Durcissement des ports utilisateur : PortFast, BPDU Guard contre un commutateur intrus', 'BC3', 'B3', 'ok', 'cyber-bpduguard', ''],
     ['RSTP et agrégation de liens (EtherChannel LACP/PAgP)', '—', 'B2', 'ok', 'etherchannel', ''],
     ['Routage statique et par défaut', 'BC2', 'B2', 'ok', 'routage, nat-acl', ''],
     ['Routage dynamique RIPv2', '—', 'B2', 'ok', 'routage', ''],
@@ -1396,6 +1472,7 @@ NS.COVERAGE = {
     ['DNS (zones A/CNAME/MX/PTR, résolution, redirecteurs)', 'BC2', 'B2', 'ok', 'dhcp-dns-web', 'Pas de transfert de zone / DNSSEC'],
     ['HTTP / HTTPS, serveur web', 'BC2', 'B2', 'ok', 'dhcp-dns-web, dmz', 'TLS simulé (poignée de main + contenu opaque)'],
     ['NAT / PAT, redirection de ports', 'BC2', 'B2', 'ok', 'nat-acl, dmz', ''],
+    ['Box d\'accès Internet : DHCP/NAT automatiques côté client, risque du double NAT', 'BC2', 'B1/B2', 'ok', 'wifi, box-doublenat', ''],
     ['ACL (standard/étendue, nommée, established)', 'BC3', 'B3', 'ok', 'nat-acl', ''],
     ['Pare-feu à états, zones LAN/WAN/DMZ, filtrage, journaux', 'BC3', 'B3', 'ok', 'dmz', 'Stormshield / FortiGate / pfSense (interface graphique unifiée)'],
     ['Telnet / SSH, administration à distance, sécurité des flux', 'BC3', 'B3', 'ok', 'sniff, cyber-recon', 'SSH simulé (chiffrement symbolique)'],
