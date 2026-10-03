@@ -137,6 +137,8 @@ fieldset{border:1px solid var(--line);border-radius:6px;padding:6px 10px 10px}le
 .insp-empty h3{margin-top:4px}
 /* tp */
 .tp h3{margin:0 0 4px}.tp .lvl{display:inline-block;background:#e0e7ff;color:#3730a3;border-radius:10px;padding:0 8px;font-size:11px;margin-bottom:6px}.tp ol{padding-left:18px}.tp li{margin:4px 0}.tp code{background:#f1f5f9;padding:0 4px;border-radius:3px;font-family:var(--mono);font-size:12px}
+.tt{display:inline-block;border-radius:10px;padding:1px 8px;font-size:11px;font-weight:600;margin:0 6px 6px 0;cursor:help}
+.tt-decouverte{background:#dbeafe;color:#1e40af}.tt-probleme{background:#fef3c7;color:#92400e}.tt-panne{background:#fee2e2;color:#991b1b}
 .tp .legal{background:#fef2f2;border:1px solid #fecaca;border-left:4px solid #dc2626;border-radius:6px;padding:8px 10px;margin:8px 0;font-size:12.5px;color:#7f1d1d;line-height:1.5}.tp .legal b{color:#991b1b}
 .tp .check{border:1px solid var(--line);border-radius:6px;padding:6px 8px;margin:6px 0;background:#f8fafc}
 /* licence / à propos */

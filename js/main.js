@@ -90,6 +90,17 @@ const SCbyId = id => NS.SCENARIOS.find(s => s.id === id) || null;
 const DIFF_LABEL = { 1: 'Facile', 2: 'Intermédiaire', 3: 'Avancé' };
 function diffStars(n) { n = n || 1; return '★'.repeat(n) + '☆'.repeat(3 - n); }
 function diffText(n) { return diffStars(n) + ' ' + (DIFF_LABEL[n] || DIFF_LABEL[1]); }
+/* Type pédagogique du TP : découverte (apprendre à paramétrer/vérifier une notion),
+   problème (schéma pré-configuré avec erreur(s) à relever puis corriger),
+   panne (dépannage pur : la cause n'est pas indiquée, à trouver seul). */
+const TYPE_LABEL = { decouverte: 'Découverte', probleme: 'Problème à corriger', panne: 'Panne à trouver seul' };
+const TYPE_ICON = { decouverte: '🔍', probleme: '🧩', panne: '🚨' };
+const TYPE_TITLE = {
+  decouverte: 'TP de découverte : vous apprenez à paramétrer et à vérifier une notion nouvelle, pas à pas.',
+  probleme: 'TP problème : la maquette est déjà en partie configurée, avec une ou plusieurs erreurs à observer, relever puis corriger.',
+  panne: 'TP panne : un dysfonctionnement est annoncé sans indication de cause — c\'est à vous de la trouver, par vos propres tests.',
+};
+function typeBadge(sc) { return sc.type ? h('span.tt', { class: 'tt-' + sc.type, title: TYPE_TITLE[sc.type] || '' }, TYPE_ICON[sc.type] + ' ' + (TYPE_LABEL[sc.type] || sc.type)) : null; }
 function startScenario(sc) {
   const go = () => {
     resetAll(); sim.opts.strictCables = false; $('#opt-strict').checked = false;
@@ -103,7 +114,7 @@ function renderTp() {
   const box = $('#tppane'); clear(box); const sc = app.tpCurrent;
   if (!sc) { box.appendChild(h('div', h('h3', 'Aucun TP chargé'), h('p.muted', 'Utilisez « TP d\'exemple » en haut de l\'écran pour charger un sujet avec sa topologie de départ, ses étapes, une correction et des vérifications automatiques.'))); return; }
   const res = h('div.tpres');
-  box.appendChild(h('div.tp', h('h3', sc.title), h('span.lvl', sc.level + ' · ' + sc.duration + ' · ' + diffText(sc.diff)), h('p', sc.desc),
+  box.appendChild(h('div.tp', h('h3', sc.title), typeBadge(sc), h('span.lvl', sc.level + ' · ' + sc.duration + ' · ' + diffText(sc.diff)), h('p', sc.desc),
     (sc.cat === 'Cybersécurité' ? h('div.legal', h('b', '⚠ Cadre légal — à lire avant de commencer. '),
       'Les techniques présentées dans ce TP (scan, usurpation ARP, saturation de commutateur, serveur DHCP non autorisé…) ne s\'exécutent ici que sur des équipements simulés, isolés de tout réseau réel. ',
       'En France, accéder ou se maintenir sans autorisation dans un système informatique, l\'entraver ou y introduire, modifier ou supprimer des données sont des délits pénaux (articles ',
@@ -127,12 +138,12 @@ $('#btn-scen').addEventListener('click', () => {
   const info = h('div.tp-preview');
   function fillTp() {
     clear(tpSel);
-    NS.SCENARIOS.filter(sc => (sc.cat || 'Réseau') === catSel.value).forEach(sc => tpSel.appendChild(h('option', { value: sc.id }, diffStars(sc.diff) + ' ' + sc.title)));
+    NS.SCENARIOS.filter(sc => (sc.cat || 'Réseau') === catSel.value).forEach(sc => tpSel.appendChild(h('option', { value: sc.id }, (TYPE_ICON[sc.type] || '') + ' ' + diffStars(sc.diff) + ' ' + sc.title)));
     updateInfo();
   }
   function updateInfo() {
     const sc = SCbyId(tpSel.value); clear(info);
-    if (sc) info.appendChild(h('p.muted', h('b', diffText(sc.diff) + ' · ' + sc.level + ' · ' + sc.duration), h('br'), sc.desc));
+    if (sc) info.appendChild(h('p.muted', typeBadge(sc), h('br'), h('b', diffText(sc.diff) + ' · ' + sc.level + ' · ' + sc.duration), h('br'), sc.desc));
   }
   catSel.addEventListener('change', fillTp); tpSel.addEventListener('change', updateInfo);
   fillTp();
