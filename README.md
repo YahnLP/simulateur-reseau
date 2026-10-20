@@ -26,7 +26,7 @@ SNMPv3, IPv6 sur TCP/UDP applicatifs avancés, ACL IPv6, NAT-T/DPD/IKEv2, crypto
 
 ## Écrire un TP de cours (fichier)
 
-Un TP se décrit dans `tools/tp-cours/<nom>.js` : `meta` (titre, objectifs, étapes, vérifications), `build(sim)` (plan de départ) et `solve(sim)` (correction). Vérifications déclaratives disponibles : `ping`, `noping`, `http` et `cli` (une commande exécutée sur un équipement, sortie comparée à une expression régulière ; `dev` peut être une liste de noms, utile quand l'élève renomme l'équipement). `node tools/gen-tp-cours.js <dossier>` produit les `.json` et contrôle que le départ échoue et que la correction réussit. Le texte des étapes est échappé à l'ouverture : seules les balises `<code>` et `<b>` sont conservées.
+Un TP se décrit dans `tools/tp-cours/<nom>.js` : `meta` (titre, objectifs, étapes, vérifications), `build(sim)` (plan de départ) et `solve(sim)` (correction). Vérifications déclaratives disponibles : `ping`, `noping`, `http` et `cli` (une commande exécutée sur un équipement, sortie comparée à une expression régulière ; `dev` peut être une liste de noms, utile quand l'élève renomme l'équipement). `node tools/gen-tp-cours.js <dossier>` produit les `.json` et contrôle que le départ échoue et que la correction réussit. TP de cours déjà décrits : BTS SIO SISR 1re année, bloc 2 (S04 à S09 et STP en S08) ; 2e année, bloc 2 (QoS LLQ sur routeur Cisco, tunnel IPsec site à site) et bloc 3 (802.1X avec RADIUS). Le texte des étapes est échappé à l'ouverture : seules les balises `<code>` et `<b>` sont conservées.
 
 ## Licence
 
