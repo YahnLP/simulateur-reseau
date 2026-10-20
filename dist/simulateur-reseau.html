@@ -6530,7 +6530,18 @@ class Session {
     const finish = () => { io.done(); };
     try {
       const cfgBefore = this.mode !== 'user' && this.mode !== 'priv';
-      const r = this.run(l, io, line);
+      let r;
+      const pm = (this.mode === 'user' || this.mode === 'priv') && /^(.+?)\s*\|\s*(include|inc|exclude|exc|begin|beg|section|sec)\s+(.+)$/i.exec(l);
+      if (pm) {
+        /* filtre de sortie « | include|exclude|begin|section motif » (insensible à la casse, comme IOS pour les motifs simples) */
+        let buf = ''; const mode = pm[2].toLowerCase().slice(0, 3); let re; try { re = new RegExp(pm[3].trim(), 'i'); } catch (e) { re = null; }
+        const fio = Object.create(io);
+        fio.print = s => { buf += s; };
+        const flush = () => { if (buf !== null) { const o = pipeFilter(buf, mode, re); buf = null; io.print(o); } };
+        fio.done = () => { flush(); io.done(); };
+        r = this.run(pm[1].trim(), fio, pm[1]);
+        if (r !== 'async') flush();
+      } else r = this.run(l, io, line);
       if (cfgBefore && (this.mode === 'priv' || this.mode === 'user') && !this.dev.restoring && this.dev.mgmt) this.dev.log('%SYS-5-CONFIG_I: Configured from console by console');
       if (r === 'async') asyncFlag = true;
       if (this.isSwitch && this.mode !== 'user' && this.mode !== 'priv' && this.dev.syncChans) { this.dev.syncChans(); if (this.dev.stp.enabled) this.dev.stp.recompute(); }
@@ -6725,6 +6736,16 @@ function addAclEntry(acl, e, seq) {
 /* ------------------------------------------------------------- génération de la configuration */
 /* chiffrement « type 7 » de Cisco (réversible : c'est du codage, pas du hachage) */
 function type7(s) { const X = 'dsfd;kfoA,.iyewrkldJKDHSUBsgvca69834ncxv9873254k;fg87'; const seed = (s.length * 7) % 16; let o = ('0' + seed).slice(-2); for (let i = 0; i < s.length; i++) o += ('0' + (s.charCodeAt(i) ^ X.charCodeAt((seed + i) % X.length)).toString(16)).slice(-2).toUpperCase(); return o; }
+function pipeFilter(text, mode, re) {
+  if (!re) return '% Invalid regular expression\n';
+  const lines = text.split('\n'); const trail = lines.length && lines[lines.length - 1] === ''; if (trail) lines.pop();
+  let out = [];
+  if (mode === 'inc') out = lines.filter(l => re.test(l));
+  else if (mode === 'exc') out = lines.filter(l => !re.test(l));
+  else if (mode === 'beg') { const i = lines.findIndex(l => re.test(l)); out = i < 0 ? [] : lines.slice(i); }
+  else { let on = false; lines.forEach(l => { if (/^\S/.test(l)) on = re.test(l); else if (on) { out.push(l); return; } if (on) out.push(l); }); }
+  return out.length ? out.join('\n') + '\n' : '';
+}
 function genConfig(dev, save) {
   const L = []; const isSw = dev instanceof NS.Switch; const p = t => L.push(t);
   p('!'); if (!save) { p('version 15.1'); p('service timestamps debug datetime msec'); p('service timestamps log datetime msec'); p(dev.pwEnc ? 'service password-encryption' : 'no service password-encryption'); p('!'); }
