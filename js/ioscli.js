@@ -266,9 +266,12 @@ function addAclEntry(acl, e, seq) {
 }
 
 /* ------------------------------------------------------------- génération de la configuration */
+/* chiffrement « type 7 » de Cisco (réversible : c'est du codage, pas du hachage) */
+function type7(s) { const X = 'dsfd;kfoA,.iyewrkldJKDHSUBsgvca69834ncxv9873254k;fg87'; const seed = (s.length * 7) % 16; let o = ('0' + seed).slice(-2); for (let i = 0; i < s.length; i++) o += ('0' + (s.charCodeAt(i) ^ X.charCodeAt((seed + i) % X.length)).toString(16)).slice(-2).toUpperCase(); return o; }
 function genConfig(dev, save) {
   const L = []; const isSw = dev instanceof NS.Switch; const p = t => L.push(t);
-  p('!'); if (!save) { p('version 15.1'); p('service timestamps debug datetime msec'); p('service timestamps log datetime msec'); p('no service password-encryption'); p('!'); }
+  p('!'); if (!save) { p('version 15.1'); p('service timestamps debug datetime msec'); p('service timestamps log datetime msec'); p(dev.pwEnc ? 'service password-encryption' : 'no service password-encryption'); p('!'); }
+  if (save && dev.pwEnc) { p('service password-encryption'); p('!'); }
   p('hostname ' + dev.name); p('!');
   if (dev.enableSecret) p('enable secret ' + (save ? dev.enableSecret : '5 $1$mERr$' + B.hex((dev.enableSecret.length * 7919) >>> 0, 8) + '.FvWbxCzs'));
   if (dev.enableSecret) p('!');
@@ -386,8 +389,10 @@ function genConfig(dev, save) {
   if (NS.ip6Global) NS.ip6Global(dev, p, 'post');
   if (NS.mgmtConfig) NS.mgmtConfig(dev, p);
   if (dev.banner) { p('banner motd ^C' + dev.banner + '^C'); p('!'); }
-  p('line con 0'); p(' logging synchronous'); p('line vty 0 4');
-  if (dev.vty.password) p(' password ' + dev.vty.password); if (dev.vty.login) p(' login'); if (dev.vty.local) p(' login local');
+  const pw = x => (!save && dev.pwEnc) ? '7 ' + type7(x) : x; const con = dev.con || {};
+  p('line con 0'); if (con.timeout) p(' exec-timeout ' + con.timeout); if (con.password) p(' password ' + pw(con.password)); if (con.login) p(' login'); p(' logging synchronous'); p('line vty ' + (dev.vty.range || '0 4'));
+  if (dev.vty.timeout) p(' exec-timeout ' + dev.vty.timeout);
+  if (dev.vty.password) p(' password ' + pw(dev.vty.password)); if (dev.vty.login) p(' login'); if (dev.vty.local) p(' login local');
   if (dev.vty.loginList) p(' login authentication ' + dev.vty.loginList);
   if (dev.vty.transport) p(' transport input ' + dev.vty.transport);
   p('!'); if (!save) p('end');
@@ -642,7 +647,7 @@ cmd('config', 'hostname <x>', (s, a) => { s.dev.name = a.x; s.dev.sim.emit('rena
 cmd('config', 'enable secret <x...>', (s, a) => { s.dev.enableSecret = a._rest[a._rest.length - 1]; });
 cmd('config', 'enable password <x>', (s, a) => { if (!s.dev.enableSecret) s.dev.enableSecret = a.x; });
 cmd('config', 'no enable secret [<x...>]', s => { s.dev.enableSecret = ''; });
-cmd('config', 'service <x...>', () => { }); cmd('config', 'no service <x...>', () => { });
+cmd('config', 'service <x...>', (s, a) => { if (/password-encryption/.test(String(a.x))) s.dev.pwEnc = true; }); cmd('config', 'no service <x...>', (s, a) => { if (/password-encryption/.test(String(a.x))) s.dev.pwEnc = false; });
 cmd('config', 'banner motd <x...>', (s, a) => { s.dev.banner = a.x.replace(/^(\S)(.*)\1$/, '$2').replace(/^\^C|\^C$/g, ''); });
 cmd('config', 'no ip domain-lookup', s => { s.dev.noDomainLookup = true; });
 cmd('config', 'ip domain-lookup', s => { s.dev.noDomainLookup = false; });
@@ -853,13 +858,14 @@ cmd('rip', 'redistribute static [<x...>]', s => { s.dev.rip.redistStatic = true;
 cmd('rip', 'redistribute <x...>', () => { });
 
 /* ---- lignes (console / vty) ---- */
-cmd('config', 'line <t> [<x...>]', (s, a) => { s.mode = 'line'; s.ctx = { type: a.t.toLowerCase() }; });
-cmd('line', 'password <x>', (s, a) => { if (s.ctx.type.startsWith('v')) s.dev.vty.password = a.x; else s.dev.conPassword = a.x; });
+cmd('config', 'line <t> [<x...>]', (s, a) => { s.mode = 'line'; s.ctx = { type: a.t.toLowerCase() }; if (s.ctx.type.startsWith('v')) s.dev.vty.range = String(a.x || '').replace(/,/g, ' ').trim() || '0 4'; });
+const lineObj = s => s.ctx.type.startsWith('v') ? s.dev.vty : (s.dev.con = s.dev.con || {});
+cmd('line', 'password <x>', (s, a) => { lineObj(s).password = a.x; });
 cmd('line', 'login local', s => { s.dev.vty.login = true; s.dev.vty.local = true; });
-cmd('line', 'login', s => { if (s.ctx.type.startsWith('v')) s.dev.vty.login = true; });
-cmd('line', 'no login', s => { s.dev.vty.login = false; s.dev.vty.local = false; });
+cmd('line', 'login', s => { lineObj(s).login = true; });
+cmd('line', 'no login', s => { const o = lineObj(s); o.login = false; if (o === s.dev.vty) o.local = false; });
 cmd('line', 'transport input <x...>', (s, a) => { s.dev.vty.transport = a.x; });
-cmd('line', 'exec-timeout <x...>', () => { }); cmd('line', 'logging <x...>', () => { }); cmd('line', 'privilege <x...>', () => { }); cmd('line', 'no <x...>', () => { }); cmd('line', 'access-class <x...>', () => { });
+cmd('line', 'exec-timeout <x...>', (s, a) => { lineObj(s).timeout = String(a.x).replace(/,/g, ' '); }); cmd('line', 'logging <x...>', () => { }); cmd('line', 'privilege <x...>', () => { }); cmd('line', 'no <x...>', () => { }); cmd('line', 'access-class <x...>', () => { });
 
 /* ------------------------------------------------------------- serveur telnet/ssh du routeur */
 function attachRemote(dev) {

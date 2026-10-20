@@ -14,6 +14,7 @@ Simulateur réseau pédagogique hors-ligne, type Filius/Packet Tracer, avec anal
 - **Habilitation Stormshield** : politique de filtrage (moindre privilège), diagnostic par le journal — section « Stormshield ».
 - **TP d'exemple** (menu à listes déroulantes : section puis sujet) avec correction et vérification automatique du travail ; matrice de couverture du programme (menu Aide).
 - Sauvegarde/chargement JSON, sauvegarde automatique dans le navigateur (localStorage).
+- **TP « fichier »** : un plan `.json` peut embarquer ses consignes, ses vérifications automatiques et sa correction (bloc `tpfile`). L'élève l'ouvre avec **Ouvrir** : le panneau « Sujet de TP » s'affiche avec **Vérifier mon travail**, **Charger la correction** et **Recommencer**. Les fichiers des TP de cours se génèrent avec `node tools/gen-tp-cours.js <dossier>` à partir des spécifications de `tools/tp-cours/` (voir ci-dessous).
 
 ## Fiches produits
 
@@ -22,6 +23,10 @@ Simulateur réseau pédagogique hors-ligne, type Filius/Packet Tracer, avec anal
 ## Limites connues (non simulé)
 
 SNMPv3, IPv6 sur TCP/UDP applicatifs avancés, ACL IPv6, NAT-T/DPD/IKEv2, cryptographie réelle (chiffrements symboliques), CUCM/CME, VLAN hopping et SYN flood (abordés en cours), stacking/MSTP sur l'OmniSwitch.
+
+## Écrire un TP de cours (fichier)
+
+Un TP se décrit dans `tools/tp-cours/<nom>.js` : `meta` (titre, objectifs, étapes, vérifications), `build(sim)` (plan de départ) et `solve(sim)` (correction). Vérifications déclaratives disponibles : `ping`, `noping`, `http` et `cli` (une commande exécutée sur un équipement, sortie comparée à une expression régulière ; `dev` peut être une liste de noms, utile quand l'élève renomme l'équipement). `node tools/gen-tp-cours.js <dossier>` produit les `.json` et contrôle que le départ échoue et que la correction réussit. Le texte des étapes est échappé à l'ouverture : seules les balises `<code>` et `<b>` sont conservées.
 
 ## Licence
 
@@ -48,6 +53,7 @@ node tests/t_scen.js     # scénario de base bout en bout
 node tests/t_sc.js       # tous les TP : build → vérif « avant » → solve → vérif « après »
 node tests/t_an.js       # analyseur
 node tests/t_cyber.js    # outils cybersécurité (nmap, arpspoof, macflood)
+node tests/t_tpfile.js   # TP fichiers : départ en échec, correction réussie, fichiers invalides refusés
 node tools/build.js      # reconstruit dist/simulateur-reseau.html (fichier autonome)
 ```
 

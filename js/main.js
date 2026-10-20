@@ -57,10 +57,10 @@ $$('.rtab').forEach(b => b.addEventListener('click', () => { $$('.rtab').forEach
 const showRight = r => $$('.rtab').find(b => b.dataset.r === r).click();
 
 /* ------------------------------------------------ fichiers */
-function snapshot() { return NS.saveTopology(sim, { tp: app.tpCurrent ? app.tpCurrent.id : null }); }
+function snapshot() { const sc = app.tpCurrent; return NS.saveTopology(sim, sc && sc.file ? { tpfile: NS.tpFileBlock(sc) } : { tp: sc ? sc.id : null }); }
 function autosave() { try { localStorage.setItem(LS, JSON.stringify(snapshot())); } catch (e) { } }
 function loadData(d, quiet) {
-  try { closeAllDev(); NS.loadTopology(sim, d); app.sel = null; app.tpCurrent = SCbyId(d.tp); renderTp(); $('#opt-strict').checked = !!sim.opts.strictCables; $('#opt-stp').checked = !!sim.opts.stpFast; app.refresh(); app.fit(); if (app.analyzer) { app.analyzer.clear(); app.analyzer.fillLinks(); } if (!quiet) ui.toast('Plan chargé', 'ok'); }
+  try { closeAllDev(); NS.loadTopology(sim, d); app.sel = null; app.tpCurrent = d.tpfile ? NS.tpFromFile(d) : SCbyId(d.tp); renderTp(); if (d.tpfile && !quiet) showRight('tp'); $('#opt-strict').checked = !!sim.opts.strictCables; $('#opt-stp').checked = !!sim.opts.stpFast; app.refresh(); app.fit(); if (app.analyzer) { app.analyzer.clear(); app.analyzer.fillLinks(); } if (!quiet) ui.toast(d.tpfile ? 'TP chargé : ' + app.tpCurrent.title : 'Plan chargé', 'ok'); if (d.tpfile && !quiet) sim.runFor(2000); }
   catch (e) { ui.toast('Fichier invalide : ' + e.message, 'err'); console.error(e); }
 }
 function closeAllDev() { ui.closeAllWindows(); sim.devices.forEach(d => { d._sess = null; d._termApi = null; d._termBanner = false; }); }
